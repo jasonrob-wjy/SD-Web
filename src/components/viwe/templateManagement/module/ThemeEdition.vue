@@ -1,8 +1,19 @@
 <template>
   <div class="warp">
-    <h3>接口说明：</h3>
-    <div>由于图表数据量可能较大，在这里只提供部分数据结构用于模拟演示，便于后端接口开发；</div>
-    <h3>图谱源码：</h3>
+     <h3>配置说明：</h3>
+    <div>
+      1、此
+      <span class="code">Theme</span>无需下载，可以直接复制以下代码，粘贴到所需位置；
+    </div>
+    <div>
+      2、然后在
+      <span class="code">this.echarts.registerTheme(themeName, theme);</span>中引用；
+    </div>
+    <!-- <div>
+      3、复制以下<span class="code">Theme源码</span>，请点击这里
+      <span class="docode">复制源码</span> 复制到粘贴板或在code中复制；
+    </div> -->
+    <h3>Theme配置：</h3>
     <div class="content">
       <AceEditor :content="api" lang="javascript" />
     </div>

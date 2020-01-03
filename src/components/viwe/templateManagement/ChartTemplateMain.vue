@@ -3,26 +3,23 @@
     <div class="left">
       <h2>默认主题</h2>
       <div style="padding:5px;">
-        <Select v-model="model1">
+        <Select v-model="typeVal" clearable @on-change="onQuery">
           <Option v-for="item in cityList3" :value="item.value" :key="item.value">{{ item.label }}</Option>
         </Select>
       </div>
-       <h2>图表类型</h2>
+      <h2>图表类型</h2>
       <ul>
-        <li class="active">默认全部（130）</li>
-        <li>饼状图谱（10）</li>
-        <li>柱状图谱（20）</li>
-        <li>折线图谱（1）</li>
-        <li>力导图谱（20）</li>
-        <li>散点图谱</li>
-        <li>雷达图谱</li>
-        <li>树状图谱</li>
-        <li>平行坐标</li>
-        <li>主题河流</li>
+        <li :class="[!typeVal?'active':'']" @click="onQuery('',true)">默认全部（{{typeCount}}）</li>
+        <li
+          v-for="(item,i) in typeArr"
+          :key="i+'q'"
+          :class="[typeVal===item.type?'active':'']"
+          @click="onQuery(item.type,true)"
+        >{{item.type}}（{{item.count}}）</li>
       </ul>
     </div>
     <div class="right">
-     <ChartList/>
+      <ChartList ref="chart" @on-change="onChange" @on-page="onPage" @on-query="onQuery" />
     </div>
   </div>
 </template>
@@ -48,79 +45,122 @@ export default {
         {
           value: "项目1",
           label: "项目1"
-        },
-        {
-          value: "项目2",
-          label: "项目2"
-        },
-        {
-          value: "项目3",
-          label: "项目3"
-        },
-        {
-          value: "项目4",
-          label: "项目4"
-        },
-        {
-          value: "项目5",
-          label: "项目5"
-        },
-        {
-          value: "项目6",
-          label: "项目6"
         }
       ],
       cityList4: [
         {
           value: "默认全部",
           label: "默认全部"
-        },
-        {
-          value: "指派给我",
-          label: "指派给我"
-        },
-        {
-          value: "指派他人",
-          label: "指派他人"
-        },
-        {
-          value: "由我创建",
-          label: "由我创建"
         }
       ],
       cityList5: [
         {
           value: "默认全部",
           label: "默认全部"
-        },
-        {
-          value: "待处理",
-          label: "待处理"
-        },
-        {
-          value: "待回测",
-          label: "待回测"
-        },
-        {
-          value: "未解决",
-          label: "未解决"
-        },
-        {
-          value: "已解决",
-          label: "已解决"
-        },
-        {
-          value: "已关闭",
-          label: "已关闭"
-        },
-        {
-          value: "被延期",
-          label: "被延期"
         }
-      ]
+      ],
+      pageNo: 1,
+      pageSize: 12,
+      typeVal: "",
+      content: [],
+      typeCount: 0,
+      typeArr: []
     };
   },
+  created() {
+    this.$axios
+      .get("/api/template/chart/type")
+      .then(res => {
+        if (res.data.result) {
+          this.typeArr = res.data.type;
+          this.typeCount = res.data.count;
+          //传递到子组件
+          let chart = this.$refs.chart;
+          chart.setData(
+            this.content,
+            this.typeArr,
+            this.content.length !== this.total
+          );
+        } else {
+          this.$Message["error"]({
+            background: true,
+            content: "数据请求失败！"
+          });
+        }
+
+        // this.$router.push({ path: "/Artlist" });
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
+    this.getData({});
+  },
   methods: {
+    onQuery(obj, mark) {
+      this.pageNo = 1;
+      if (mark) {
+        this.typeVal = obj;
+        this.getData({});
+      } else {
+        this.getData(obj);
+      }
+    },
+    onChange() {
+      this.getData({});
+    },
+    onPage(page) {
+      this.pageNo = page;
+      this.getData({}, "page");
+    },
+    getData(obj, page) {
+      let data = {
+        pageNo: this.pageNo,
+        pageSize: this.pageSize
+      };
+
+      if (obj.author) {
+        data.author = obj.author;
+      }
+      if (obj.publish) {
+        data.publish = obj.publish;
+      }
+      if (obj.title) {
+        data.title = obj.title;
+      }
+      if (this.typeVal) {
+        data.type = this.typeVal;
+      }
+      this.$axios
+        .get("/api/template/chart", { params: data })
+        .then(res => {
+          if (res.data.result) {
+            if (page === "page") {
+              this.content = [...this.content, ...res.data.list];
+            } else {
+              this.content = res.data.list;
+            }
+            //传递到子组件
+            this.total = res.data.total;
+            let chart = this.$refs.chart;
+            chart.setData(
+              this.content,
+              this.typeArr,
+              this.content.length !== this.total,
+              this.pageNo
+            );
+          } else {
+            this.$Message["error"]({
+              background: true,
+              content: "数据请求失败！"
+            });
+          }
+
+          // this.$router.push({ path: "/Artlist" });
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    },
     setOneBugIsShow() {
       this.$store.commit("setOneBugIsShow", true);
     }
@@ -173,7 +213,6 @@ export default {
   .right {
     //  padding: 20px;
     width: 85%;
-    
   }
   .warp {
     padding: 10px;

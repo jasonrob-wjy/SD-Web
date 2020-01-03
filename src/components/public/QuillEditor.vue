@@ -27,8 +27,9 @@ import * as Quill from "quill";
 export default {
   data() {
     return {
-      content: `<p>[步骤]</p><p><br></p><p><br></p><p>[结果]</p><p><br></p><p><br></p><p>[期望]</p><p><br></p><p><br></p><p><br></p><p><br></p>`,
+      // content: `<p>[步骤]</p><p><br></p><p><br></p><p>[结果]</p><p><br></p><p><br></p><p>[期望]</p><p><br></p><p><br></p><p><br></p><p><br></p>`,
       editorOption: {
+        height: "200px",
         modules: {
           toolbar: [
             ["bold", "italic", "underline", "strike"], //加粗，斜体，下划线，删除线
@@ -52,21 +53,23 @@ export default {
       }
     };
   },
+  props: ["content"],
   // manually control the data synchronization
   // 如果需要手动控制数据同步，父组件需要显式地处理changed事件
   methods: {
     onEditorBlur(quill) {
-      console.log("editor blur!", quill);
+      // console.log("editor blur!", quill);
     },
     onEditorFocus(quill) {
-      console.log("editor focus!", quill);
+      // console.log("editor focus!", quill);
     },
     onEditorReady(quill) {
-      console.log("editor ready!", quill);
+      // console.log("editor ready!", quill);
     },
-    onEditorChange({ quill, html, text }) {
-      console.log("editor change!", quill, html, text);
-      this.content = html;
+    onEditorChange(quill) {
+      // console.log(quill);
+      // this.content = quill;
+      this.$emit("on-change", quill);
     }
   },
   computed: {
@@ -75,7 +78,7 @@ export default {
     }
   },
   mounted() {
-    console.log("this is current quill instance object", this.editor);
+    // console.log("this is current quill instance object", this.editor);
   }
 };
 </script>
@@ -180,12 +183,13 @@ export default {
 .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="36px"]::before {
   content: "36px";
 }
-.ql-toolbar.ql-snow{
-    border: 1px solid #dcdee2;
-    border-radius: 4px 4px 0 0;
+.ql-toolbar.ql-snow {
+  border: 1px solid #dcdee2;
+  border-radius: 4px 4px 0 0;
 }
-.ql-container.ql-snow{
-     border: 1px solid #dcdee2;
-      border-radius: 0 0 4px 4px;
+.ql-container.ql-snow {
+  border: 1px solid #dcdee2;
+  border-radius: 0 0 4px 4px;
+  height: 200px;
 }
 </style>

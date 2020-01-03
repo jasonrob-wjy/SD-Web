@@ -5,33 +5,87 @@
         <div class="me-left"></div>
         <ol class="me-right">
           <li @click="handleTab('a')" :class="[action==='a'?'action':'']">代码编辑</li>
-          <li @click="handleTab('b')" :class="[action==='b'?'action':'']">主题编辑</li>
           <li @click="handleTab('c')" :class="[action==='c'?'action':'']">API编辑</li>
+          <li @click="handleTab('b')" :class="[action==='b'?'action':'']">使用说明</li>
         </ol>
       </div>
-      <ul class="tab">
-        <li v-show="action==='a'">
-          <AceEditor />
-        </li>
-        <li v-show="action==='b'">
-          <AceEditor />
-        </li>
-        <li v-show="action==='c'">
-          <AceEditor />
-        </li>
-      </ul>
+      <div class="tab">
+        <ul>
+          <li v-show="action==='a'">
+            <AceEditor :content="option" lang="javascript" @on-change="onOptionChange" />
+          </li>
+          <li v-show="action==='c'">
+            <AceEditor
+              :content="data"
+              ref="dataEditor"
+              lang="javascript"
+              @on-change="onDataChange"
+            />
+          </li>
+          <li v-show="action==='b'" class="sysm">
+            <div>
+              <h3>后台接口默认返回如下三种数据格式（字段不同）：</h3>
+              <pre>
+    后台返回数据格式：
+    {
+        "result": true,
+        "code": 200,
+       <span
+  class="code"
+>"content": &lt; Object||Array ></span>
+    }
+    
+    前台获取返回数据：
+   <span class="code">let data = res.data.content</span>  
+            </pre>或者：
+              <pre>
+    后台返回数据格式：
+    {
+        "result": true,
+        "code": 200,
+       <span
+  class="code"
+>"data": &lt; Object||Array ></span> 
+    }    
+
+    前台获取返回数据：
+   <span class="code">let data = res.data.data</span>  
+           </pre>或者：
+              <pre>
+    后台返回数据格式：
+    {
+        "result": true,
+        "code": 200,
+       <span
+  class="code"
+>"list": &lt; Object||Array ></span> 
+        
+    }    
+
+    前台获取返回数据：
+   <span class="code">let data = res.data.list</span>  
+            </pre>
+            </div>
+            <div v-if="explain">
+              <h3>图谱相关说明：</h3>
+              <div v-html="explain"></div>
+            </div>
+          </li>
+        </ul>
+      </div>
       <!-- 按钮 -->
       <div class="handle-box">
         <div class="button">
-          <span>
+          <!-- <span @click="onOptionChange(false)">
             <Icon type="ios-play-outline" size="20" />
             <span>运行</span>
-          </span>
-          <span>
+          </span>-->
+          <!-- <span>
             <Icon type="ios-cloud-upload-outline" size="18" />
             <span>保存</span>
-          </span>
-          <span>
+          </span>-->
+
+          <span @click="getBidData">
             <Icon type="ios-refresh" size="20" />
             <span>重置</span>
           </span>
@@ -40,8 +94,39 @@
     </div>
 
     <div class="right">
-      <div class="title">标题</div>
-      <EchartsTemplate />
+      <div class="title">
+        <span>{{title}} 展示</span>
+        <div>
+          数据请求地址：
+          <label>方式</label>
+          <Select v-model="urlType" value="GET" style="width:75px;">
+            <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          </Select>
+          <Tooltip max-width="330" placement="bottom-start">
+            <Input
+              v-model="urlValue"
+              @on-focus="urlOnFocus"
+              @on-blur="urlOnBlur"
+              placeholder="请输入请求地址..."
+              style="width: 300px"
+            />
+            <div slot="content">
+              <p style="margin:10px 0;">
+                ★ 返回数据可在左侧的
+                <span class="code" @click="handleTab('c')">API编辑</span>中查看编辑。
+              </p>
+              <p style="margin:10px 0;">
+                ★ 详情请查看左侧的
+                <span class="code" @click="handleTab('b')">使用说明</span>。
+              </p>
+            </div>
+          </Tooltip>
+
+          <Button type="info" ghost @click="getUrlData">确定</Button>
+          <Button type="success" ghost @click="handleClear">重置</Button>
+        </div>
+      </div>
+      <EchartsTemplate ref="template" />
       <!-- 左侧抽屉 主题样式 -->
       <Drawer
         title="主题选择"
@@ -50,32 +135,32 @@
         :draggable="true"
         v-model="drawer"
       >
-       <RadioGroup v-model="vertical" vertical>
-        <Radio label="apple">
+        <RadioGroup v-model="vertical" vertical>
+          <Radio label="apple">
             <Icon type="social-apple"></Icon>
             <span>Apple</span>
-        </Radio>
-        <Radio label="android">
+          </Radio>
+          <Radio label="android">
             <Icon type="social-android"></Icon>
             <span>Android</span>
-        </Radio>
-        <Radio label="windows">
+          </Radio>
+          <Radio label="windows">
             <Icon type="social-windows"></Icon>
             <span>Windows</span>
-        </Radio>
-    </RadioGroup>
+          </Radio>
+        </RadioGroup>
       </Drawer>
       <!-- 按钮 -->
       <div class="handle-box">
         <div class="button">
-          <span>
+          <!-- <span>
             <Icon type="ios-cloud-download-outline" size="18" />
             <span>下载</span>
           </span>
           <span @click="handleDrawer">
-           <Icon type="md-options"  size="16" />
+            <Icon type="md-options" size="16" />
             <span>主题</span>
-          </span>
+          </span>-->
           <span @click="handleRouter">
             <Icon type="ios-redo-outline" size="20" />
             <span>返回</span>
@@ -97,25 +182,37 @@ export default {
   },
   data: () => ({
     drawer: false,
-    vertical: 'apple',
+    vertical: "apple",
     split: 0.35,
     action: "a",
-    html: '<div class="myChart" ref="myChart"></div>',
-    selectVal: "",
-    cityList3: [
+    html: "",
+    urlType: "GET",
+    urlValue: "",
+    tooltipContent: "",
+    cityList: [
       {
-        value: "项目1",
-        label: "项目1"
+        label: "GET",
+        value: "GET"
       },
       {
-        value: "项目2",
-        label: "项目2"
-      },
-      {
-        value: "项目3",
-        label: "项目3"
+        label: "POST",
+        value: "POST"
       }
-    ]
+    ],
+
+    title: "",
+    type: "",
+    look: 1,
+    author: "",
+    option: "",
+    theme: "",
+    data: "",
+    imgSrc: "",
+    url: "",
+    explain: "",
+    bid: "",
+    date: "",
+    chartClass: "0"
   }),
   props: {
     msg: String
@@ -131,10 +228,150 @@ export default {
 
   //   }
   // },
+  created() {
+    this.tooltipContent = `返回的数据可以在左侧 API编辑 中查看或编辑。`;
+  },
   mounted() {
-    console.log(this.$refs.splits);
+    this.bid = this.$route.query.bid;
+    this.getBidData();
   },
   methods: {
+    // 数据请求地址相关函数
+    urlOnFocus() {
+      if (!this.urlValue) {
+        this.urlValue = "http://";
+      }
+    },
+    urlOnBlur() {
+      if (this.urlValue === "http://") {
+        this.urlValue = "";
+      }
+    },
+    handleClear() {
+      this.action = "a";
+      this.urlValue = "";
+    },
+
+    getUrlData() {
+      this.$Message.destroy();
+      this.action = "c";
+      if (this.urlType === "GET") {
+        this.$axios
+          .get(this.urlValue)
+          .then(res => {
+            this.handleData(res);
+          })
+          .catch(error => {
+            console.log(error);
+            this.$Message["error"]({
+              background: true,
+              content: "请输入正确的请求地址！"
+            });
+          });
+      } else {
+        this.$axios
+          .post(this.urlValue)
+          .then(res => {
+            this.handleData(res);
+          })
+          .catch(error => {
+            console.log(error);
+            this.$Message["error"]({
+              background: true,
+              content: "请输入正确的请求地址！"
+            });
+          });
+      }
+    },
+    handleData(res) {
+      this.$Message.destroy();
+      let data = res.data;
+      if (data) {
+        this.$Message["success"]({
+          background: true,
+          content: "数据请求成功！"
+        });
+        if (data.list) {
+          data = data.list;
+        } else if (data.data) {
+          data = data.data;
+        } else if (data.content) {
+          data = data.content;
+        } else {
+          this.$Message["error"]({
+            background: true,
+            content: "数据格式错误！可在左侧 Api编辑 处手动修正！"
+          });
+        }
+        let objStr = JSON.stringify(data, null, 4);
+        objStr = `let data = ` + objStr;
+        this.$refs.dataEditor.setData(objStr);
+      } else {
+        this.$Message["error"]({
+          background: true,
+          content: "返回数据为空！"
+        });
+      }
+    },
+    // handleClear() {
+    //   this.bid = "";
+    //   this.title = "";
+    //   this.type = "";
+    //   this.author = "zll";
+    //   this.option = "";
+    //   this.data = "";
+    //   this.url = "";
+    //   this.imgSrc = "";
+    //   this.explain = "";
+    //   this.bid = "";
+    //   this.date = "";
+    //   this.chartClass = "0";
+    // },
+    getBidData() {
+      this.$Message.destroy();
+      this.$axios
+        .get("/api/template/chart", { params: { bid: this.bid } })
+        .then(res => {
+          if (res.data.result) {
+            let content = res.data.content;
+            this.title = content.title;
+            this.type = content.type;
+            this.option = content.option;
+            this.data = content.data;
+            this.theme = content.theme;
+            this.imgSrc = content.imgSrc;
+            this.chartClass = content.chartClass;
+            this.explain = content.explain;
+            this.$Message["success"]({
+              background: true,
+              content: "数据请求成功！"
+            });
+            // this.$refs.template.setChart(this.option, this.data);
+          } else {
+            this.$Message["error"]({
+              background: true,
+              content: "数据请求失败！"
+            });
+          }
+        });
+    },
+
+    // option
+    onOptionChange(data) {
+      this.option = data ? data : this.option;
+      this.$refs.template.setChart(this.option, this.data, this.theme);
+    },
+    // theme
+    onThemeChange(data) {
+      this.theme = data ? data : this.theme;
+      this.$refs.template.setChart(this.option, this.data, this.theme);
+    },
+    // data
+    onDataChange(data) {
+      this.data = data ? data : this.data;
+      this.$refs.template.setChart(this.option, this.data, this.theme);
+    },
+
     handleTab(val) {
       this.action = val;
     },
@@ -164,7 +401,7 @@ export default {
       margin-top: 1px;
       .me-left {
         width: 47px;
-         border: 1px solid #ccc;
+        border: 1px solid #ccc;
       }
       .me-right {
         width: calc(100% - 47px);
@@ -172,7 +409,7 @@ export default {
         //  box-shadow: 0 1px 3px rgba(26,26,26,.1);
         li {
           width: 33.3%;
-          padding: 6px 0;
+          padding: 11.5px 0;
           text-align: center;
           border: 1px solid #ccc;
           cursor: pointer;
@@ -184,11 +421,16 @@ export default {
         }
       }
     }
-    .tab,
-    li {
+    li,
+    ul {
       height: 100%;
     }
-
+    .tab {
+      height: calc(100% - 46px);
+      ul {
+        overflow-y: auto;
+      }
+    }
     .handle-box {
       top: 60px;
       right: 32px;
@@ -226,8 +468,27 @@ export default {
       background-color: #ebebeb;
       margin-top: 1px;
       border: 1px solid #ccc;
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       margin-bottom: 24px;
+      > div {
+        display: flex;
+        align-items: center;
+        .ivu-input-wrapper {
+          margin-right: 10px;
+        }
+        label {
+          padding: 5px 10px;
+          background: #f7f9fa;
+          height: 32px;
+          border: 1px solid #dcdee2;
+          border-right: 0px;
+        }
+        button {
+          margin: 0 5px;
+        }
+      }
     }
   }
 
@@ -267,5 +528,32 @@ export default {
       color: #fa795e;
     }
   }
+}
+.sysm {
+  background-color: #fff;
+  padding: 20px;
+  > div {
+    pre {
+      margin: 8px 0;
+      padding: 8px 0;
+      background-color: #eee;
+      border-radius: 6px;
+    }
+  }
+}
+.code {
+  padding: 2px 4px;
+  cursor: pointer;
+  font-size: 90%;
+  display: inline-block;
+  color: #c7254e;
+  // background-color: #f9f2f4;
+  border-radius: 4px;
+  margin: 0 5px;
+}
+</style>
+<style lang="scss">
+.ivu-tooltip-inner-with-width {
+  white-space: initial;
 }
 </style>

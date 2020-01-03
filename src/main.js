@@ -13,6 +13,7 @@ import 'font-awesome/css/font-awesome.css';
 import axios from 'axios';
 import qs from 'qs';
 axios.defaults.baseURL = process.env.VUE_APP_URL;
+Vue.prototype.$url = process.env.VUE_APP_URL;
 Vue.prototype.$axios = axios;
 Vue.prototype.$qs = qs;
 
@@ -31,6 +32,7 @@ import VueQuillEditor from 'vue-quill-editor'
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
+
 // import * as Quill from 'quill'  //引入编辑器
 
 // //quill编辑器的字体

@@ -1,9 +1,13 @@
 const state = {
-  positionIsShow:false,
+  positionIsShow: false,
+  user: { name: 'zll',url:'' }
 }
 const mutations = {
   setPositionIsShow(state, data) {
     state.positionIsShow = data;
+  },
+  setUser(state, data) {
+    state.user = data;
   }
 }
 const actions = {
