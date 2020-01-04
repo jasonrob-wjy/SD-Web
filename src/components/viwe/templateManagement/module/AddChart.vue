@@ -53,16 +53,26 @@
         <div>
           <label v-if="chartClass==='0'">Option：</label>
           <label v-else>JS 代码：</label>
-          <Input v-model="option" type="textarea" :rows="8" :placeholder="chartClass==='0'?'请输 option 内容... let option = { ... }':'请输入 JS 代码...'" />
+          <Input
+            v-model="option"
+            type="textarea"
+            :rows="8"
+            :placeholder="chartClass==='0'?'请输 option 内容... let option = { ... }':'请输入 JS 代码...'"
+          />
         </div>
         <div>
           <label>API 数据：</label>
-          <Input v-model="data" type="textarea" :rows="8" placeholder="请输入 API 数据... 例如：let data = { ... }" />
+          <Input
+            v-model="data"
+            type="textarea"
+            :rows="8"
+            placeholder="请输入 API 数据... 例如：let data = { ... }"
+          />
         </div>
         <!-- <div>
           <label>theme 数据：</label>
           <Input v-model="theme" type="textarea" :rows="8" placeholder="请输入主题配置... 例如：let themeObj = { ... } （ 此部分可以不用填写 ）" />
-        </div> -->
+        </div>-->
         <div>
           <label v-if="chartClass==='0'">备注：</label>
           <label v-else>使用说明：</label>
@@ -70,9 +80,11 @@
         </div>
       </div>
       <div slot="footer">
-        <Button type="success" @click="handleSubmit('yes')">提交发布</Button>
-        <Button type="info" @click="handleSubmit('no')">保存草稿</Button>
-        <Button type="primary" @click.stop="handleShow">关闭</Button>
+        <div class="button-footer">
+          <Button type="success" @click="handleSubmit('yes')">提交发布</Button>
+          <Button type="info" @click="handleSubmit('no')">保存草稿</Button>
+          <Button type="primary" @click.stop="handleShow">关闭</Button>
+        </div>
       </div>
     </Modal>
   </div>
@@ -173,6 +185,23 @@ export default {
       });
     },
     handleSubmit(val) {
+      this.$Message.destroy();
+      // 判断输入内容是否为空
+      if (!this.title) {
+        this.$Message["error"]({
+          background: true,
+          content: "图谱标题不得为空！"
+        });
+        return;
+      }
+      if (!this.type) {
+        this.$Message["error"]({
+          background: true,
+          content: "图谱类型不得为空！"
+        });
+        return;
+      }
+
       let data = {
         title: this.title,
         type: this.type,
@@ -321,6 +350,9 @@ export default {
   .add-clear:hover {
     color: #19be6b;
   }
+}
+.button-footer{
+  margin-bottom: 20px;
 }
 </style>
 

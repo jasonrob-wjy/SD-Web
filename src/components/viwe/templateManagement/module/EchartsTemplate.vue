@@ -25,8 +25,12 @@ export default {
           themeObj = {};
         }
         // 主题
-        echarts.registerTheme(themeObj.themeName,themeObj.theme)
+        echarts.registerTheme(themeObj.themeName,themeObj.theme);
 
+        //清除实例
+        if (myEcharts != null && myEcharts != "" && myEcharts != undefined) {
+            myEcharts.dispose();
+        };
         //图谱初始化
         var myEcharts = echarts.init(document.querySelector('#chart'),themeObj.themeName);
        // if (loadingConfig) {
