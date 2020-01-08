@@ -3,39 +3,56 @@
     <Sider collapsible :collapsed-width="78" v-model="isCollapsed" :style="{background: '#fff'}">
       <Menu active-name="1-0" theme="light" width="auto" :class="menuitemClasses">
         <MenuItem name="1-0" @click.native="onQuery('',true)">
-          <!-- <i class="fa fa-pie-chart"></i> -->
+          <i class="fa fa-pie-component"></i>
           <span>全部组件（{{typeCount}}）</span>
         </MenuItem>
-        <MenuItem v-for="(item,i) in typeArr" :key="i+'q'" :name="'1-'+(i+1)" @click.native="onQuery(item.type,true)">
-          <!-- <i class="fa fa-pie-chart"></i> -->
+        <MenuItem
+          v-for="(item,i) in typeArr"
+          :key="i+'q'"
+          :name="'1-'+(i+1)"
+          @click.native="onQuery(item.type,true)"
+        >
+          <i class="fa fa-pie-component"></i>
           <span>{{item.type}}（{{item.count}}）</span>
         </MenuItem>
       </Menu>
     </Sider>
     <Layout>
       <div class="content-right">
-        <ChartList ref="chart" @on-change="onChange" @on-page="onPage" @on-query="onQuery" />
+        <List
+          v-if="!detail.mark"
+          ref="component"
+          @on-change="onChange"
+          @on-page="onPage"
+          @on-query="onQuery"
+          @on-detail="onDetail"
+        />
+        <Details v-else :content="detail.data" @on-change="onIsDetail" />
       </div>
     </Layout>
   </Layout>
 </template>
 
 <script>
-import ChartList from "./module/ChartList";
+import List from "./module/List";
+import Details from "./module/Details";
 export default {
   name: "temmain",
   components: {
-    ChartList
+    List,
+    Details
   },
   data() {
     return {
       isCollapsed: false,
       pageNo: 1,
+      detail: { mark: false },
       pageSize: 12,
       typeVal: "",
       content: [],
       typeCount: 0,
-      typeArr: []
+      typeArr: [],
+      classArr: []
     };
   },
   computed: {
@@ -45,17 +62,20 @@ export default {
   },
   created() {
     this.$axios
-      .get("/api/template/chart/type")
+      .get("/api/template/component/type")
       .then(res => {
         if (res.data.result) {
           this.typeArr = res.data.type;
           this.typeCount = res.data.count;
+          this.classArr = res.data.classArr;
           //传递到子组件
-          let chart = this.$refs.chart;
-          chart.setData(
+          let component = this.$refs.component;
+          component.setData(
             this.content,
             this.typeArr,
-            this.content.length !== this.total
+            this.content.length !== this.total,
+            this.pageNo,
+            this.classArr
           );
         } else {
           this.$Message["error"]({
@@ -72,7 +92,15 @@ export default {
     this.getData({});
   },
   methods: {
+    onDetail(obj) {
+      this.detail = obj;
+    },
+    onIsDetail(val){
+      this.detail.mark = val;
+       this.getData({});
+    },
     onQuery(obj, mark) {
+      this.detail.mark = false;
       this.pageNo = 1;
       if (mark) {
         this.typeVal = obj;
@@ -103,11 +131,14 @@ export default {
       if (obj.title) {
         data.title = obj.title;
       }
+      if (obj.class) {
+        data.class = obj.class;
+      }
       if (this.typeVal) {
         data.type = this.typeVal;
       }
       this.$axios
-        .get("/api/template/chart", { params: data })
+        .get("/api/template/component", { params: data })
         .then(res => {
           if (res.data.result) {
             if (page === "page") {
@@ -117,12 +148,13 @@ export default {
             }
             //传递到子组件
             this.total = res.data.total;
-            let chart = this.$refs.chart;
-            chart.setData(
+            let component = this.$refs.component;
+            component.setData(
               this.content,
               this.typeArr,
               this.content.length !== this.total,
-              this.pageNo
+              this.pageNo,
+              this.classArr
             );
           } else {
             this.$Message["error"]({

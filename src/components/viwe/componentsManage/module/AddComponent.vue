@@ -6,17 +6,17 @@
           <Icon type="ios-create-outline" size="22" />新建 / 编辑
         </h3>
       </div>
-      <div class="qhan">
+      <!-- <div class="qhan">
         <span @click="handleCharge('0')" :class="[chartClass==='0'?'active':'']">Echarts图谱</span>
         <span @click="handleCharge('1')" :class="[chartClass==='1'?'active':'']">非Echarts图谱</span>
-      </div>
+      </div>-->
       <div class="warp">
         <div>
           <label>封面上传：</label>
           <Upload
             multiple
             type="drag"
-            :action="$url+'/api/template/chart/img'"
+            :action="$url+'/api/template/component/img'"
             :on-success="handleSuccess"
             :show-upload-list="false"
           >
@@ -30,18 +30,19 @@
           </Upload>
         </div>
         <p>
-          <label>图谱标题：</label>
+          <label>组件标题：</label>
           <Input v-model="title" placeholder="请输入标题..." style="width: 300px" />
         </p>
+        <!-- 所属类别 -->
         <div v-if="isAddClear">
-          <label>图谱类型：</label>
+          <label>组件分类：</label>
           <Select v-model="type" style="width:300px">
             <Option v-for="(item,i) in typeArr" :value="item" :key="i+'w'">{{ item }}</Option>
           </Select>
           <Icon type="ios-add-circle-outline" class="add-clear" size="26" @click="handleAddClear" />
         </div>
         <div v-else>
-          <label>图谱类型：</label>
+          <label>组件分类：</label>
           <Input v-model="type" placeholder="请输入图谱类型..." style="width: 300px" />
           <Icon
             type="ios-close-circle-outline"
@@ -50,32 +51,32 @@
             @click="handleAddClear"
           />
         </div>
-        <div>
-          <label v-if="chartClass==='0'">Option：</label>
-          <label v-else>JS 代码：</label>
-          <Input
-            v-model="option"
-            type="textarea"
-            :rows="8"
-            :placeholder="chartClass==='0'?'请输 option 内容... let option = { ... }':'请输入 JS 代码...'"
+
+        <!-- 所属框架 -->
+        <div v-if="isAddClear1">
+          <label>所属框架：</label>
+          <Select v-model="classVal" style="width:300px">
+            <Option v-for="(item,i) in classArr" :value="item" :key="i+'w'">{{ item }}</Option>
+          </Select>
+          <Icon type="ios-add-circle-outline" class="add-clear" size="26" @click="handleAddClear1" />
+        </div>
+        <div v-else>
+          <label>所属框架：</label>
+          <Input v-model="classVal" placeholder="请输入框架类型..." style="width: 300px" />
+          <Icon
+            type="ios-close-circle-outline"
+            class="add-clear"
+            size="26"
+            @click="handleAddClear1"
           />
         </div>
+
         <div>
-          <label>API 数据：</label>
-          <Input
-            v-model="data"
-            type="textarea"
-            :rows="8"
-            placeholder="请输入 API 数据... 例如：let data = { ... }"
-          />
+          <label>概要内容：</label>
+          <Input v-model="brief" type="textarea" :rows="4" placeholder="请输入概要内容...'" />
         </div>
-        <!-- <div>
-          <label>theme 数据：</label>
-          <Input v-model="theme" type="textarea" :rows="8" placeholder="请输入主题配置... 例如：let themeObj = { ... } （ 此部分可以不用填写 ）" />
-        </div>-->
         <div>
-          <label v-if="chartClass==='0'">备注：</label>
-          <label v-else>使用说明：</label>
+          <label>主体内容：</label>
           <QuillEditor class="editor" :content="explain" @on-change="onEditorChange" />
         </div>
       </div>
@@ -91,18 +92,16 @@
 </template>
 <script>
 import QuillEditor from "../../../public/QuillEditor";
-import AceEditor from "./AceEditor";
 export default {
   components: {
-    QuillEditor,
-    AceEditor
+    QuillEditor
   },
   computed: {
     oneBugIsShow() {
       return this.$store.state.show.oneBugIsShow;
     }
   },
-  props: ["typeArr"],
+  props: ["typeArr", "classArr"],
   // watch: {
   //   oneBugIsShow(val) {
   //     console.log(val);
@@ -115,6 +114,7 @@ export default {
       isShow: true,
       value: "",
       isAddClear: true,
+      isAddClear1: true,
       cityList: [
         {
           value: "饼状图谱",
@@ -131,10 +131,9 @@ export default {
       type: "",
       look: 1,
       author: "",
-      option: "",
-      theme: "",
-      data: "",
+      classVal: "",
       imgSrc: "",
+      brief: "",
       url: "",
       explain: "",
       bid: "",
@@ -146,19 +145,16 @@ export default {
     let author = this.$store.state.user.info;
     this.author = author.name;
     this.url = author.url;
-    // this.url = this.$store.state.variable.user.url;
   },
   methods: {
     handleClear() {
       this.bid = "";
       this.title = "";
       this.type = "";
-      this.author = "";
-      this.option = "";
-      this.data = "";
       this.url = "";
+      this.brief = "";
       this.imgSrc = "";
-      this.theme = "";
+      this.classVal = "";
       this.explain = "";
       this.bid = "";
       this.date = "";
@@ -166,25 +162,25 @@ export default {
     },
     getBidData(bid) {
       this.bid = bid;
-      this.$axios.get("/api/template/chart", { params: { bid } }).then(res => {
-        if (res.data.result) {
-          // console.log(res.data.content);
-          let content = res.data.content;
-          this.title = content.title;
-          this.type = content.type;
-          this.option = content.option;
-          this.data = content.data;
-          this.imgSrc = content.imgSrc;
-          this.theme = content.theme;
-          this.chartClass = content.chartClass;
-          this.explain = content.explain;
-        } else {
-          this.$Message["error"]({
-            background: true,
-            content: "数据请求失败！"
-          });
-        }
-      });
+      this.$axios
+        .get("/api/template/component", { params: { bid } })
+        .then(res => {
+          if (res.data.result) {
+            let content = res.data.content;
+            this.title = content.title;
+            this.type = content.type;
+            this.imgSrc = content.imgSrc;
+            this.brief = content.brief;
+            this.classVal = content.class;
+            this.chartClass = content.chartClass;
+            this.explain = content.explain;
+          } else {
+            this.$Message["error"]({
+              background: true,
+              content: "数据请求失败！"
+            });
+          }
+        });
     },
     handleSubmit(val) {
       this.$Message.destroy();
@@ -208,20 +204,19 @@ export default {
         title: this.title,
         type: this.type,
         author: this.author,
-        option: this.option,
-        data: this.data,
-        // theme: this.theme,
+        class: this.classVal,
         imgSrc: this.imgSrc ? this.imgSrc : "/assets/img/df.png",
         url: this.url ? this.url : "/assets/img/dt.png",
         chartClass: this.chartClass,
         publish: val,
+        brief: this.brief,
         explain: this.explain
       };
       //判断更新数据还是添加数据
       if (this.bid) {
         this.$axios
           .put(
-            "/api/template/chart",
+            "/api/template/component",
             this.$qs.stringify({ bid: this.bid, data })
           )
           .then(res => {
@@ -244,7 +239,7 @@ export default {
           });
       } else {
         this.$axios
-          .post("/api/template/chart", this.$qs.stringify(data))
+          .post("/api/template/component", this.$qs.stringify(data))
           .then(res => {
             if (res.data.result) {
               this.$Message["success"]({
@@ -268,9 +263,10 @@ export default {
     handleAddClear() {
       this.isAddClear = !this.isAddClear;
     },
-    handleCharge(val) {
-      this.chartClass = val;
+    handleAddClear1() {
+      this.isAddClear1 = !this.isAddClear1;
     },
+
     handleShow() {
       this.handleClear();
       this.$store.commit("setOneBugIsShow", false);
@@ -298,28 +294,28 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.qhan {
-  position: absolute;
-  top: 3px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  span {
-    padding: 10px;
-    margin: 6px 12px;
-    border: 1px solid #fff;
-    border-radius: 6px 6px 0 0;
-    cursor: pointer;
-  }
-  span:hover,
-  span.active {
-    border: 1px solid #e8eaec;
-    background-color: #fff;
-    border-bottom: 0px;
-    color: #19be6b;
-  }
-}
+// .qhan {
+//   position: absolute;
+//   top: 3px;
+//   left: 0;
+//   right: 0;
+//   display: flex;
+//   justify-content: center;
+//   span {
+//     padding: 10px;
+//     margin: 6px 12px;
+//     border: 1px solid #fff;
+//     border-radius: 6px 6px 0 0;
+//     cursor: pointer;
+//   }
+//   span:hover,
+//   span.active {
+//     border: 1px solid #e8eaec;
+//     background-color: #fff;
+//     border-bottom: 0px;
+//     color: #19be6b;
+//   }
+// }
 .warp {
   img {
     display: block;

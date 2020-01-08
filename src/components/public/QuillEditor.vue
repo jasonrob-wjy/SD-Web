@@ -46,7 +46,7 @@ export default {
 
             ["blockquote", "code-block"], //引用，代码块
             ["clean"], //清除字体样式
-            ["image"] //上传图片、上传视频
+            // ["image","fullScreen"] //上传图片、上传视频
           ]
         },
         theme: "snow"

@@ -13,26 +13,25 @@ export default {
   methods: {
     setChart(option, content, themeObj) {
       if (option && content) {
-        let text = content + option;
-
-        if (themeObj) {
-          text = text + themeObj;
-        };
-
-        text = text +
-        `
-        if (!themeObj) {
-          themeObj = {};
-        }
+        // if (themeObj) {
+        //   color = themeObj.theme.color;
+        // }
+        let text =
+          content +
+          ";" +
+          option +
+          ";" +
+          `
         // 主题
-        echarts.registerTheme(themeObj.themeName,themeObj.theme);
+        
+        // echarts.registerTheme(themeObj.name,themeObj.theme);
 
         //清除实例
         if (myEcharts != null && myEcharts != "" && myEcharts != undefined) {
             myEcharts.dispose();
         };
         //图谱初始化
-        var myEcharts = echarts.init(document.querySelector('#chart'),themeObj.themeName);
+        var myEcharts = echarts.init(document.querySelector('#chart'));
        // if (loadingConfig) {
           //显示加载动画
           myEcharts.showLoading();
@@ -58,6 +57,7 @@ export default {
         //关闭加载动画
         myEcharts.hideLoading();
         `;
+        // console.log(text);
         eval(text);
       }
     }
@@ -71,7 +71,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .warp {
-  height: calc(100% - 60px);
+  height: calc(100% - 90px);
   width: calc(100% - 56px);
 }
 .chart {

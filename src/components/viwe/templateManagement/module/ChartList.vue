@@ -4,7 +4,7 @@
       <div class="select">
         <label>编辑</label>
         <Select v-model="authorVal" clearable @on-change="handleQuery" style="width:90px">
-          <Option v-for="item in cityList1" :value="item" :key="item">{{ item }}</Option>
+          <Option v-for="item in cityList1" :value="item.name" :key="item.name">{{ item.name }}</Option>
         </Select>
         <label>状态</label>
         <Select v-model="publishVal" clearable @on-change="handleQuery" style="width:90px">
@@ -38,7 +38,9 @@
         </div>
 
         <div class="img-warp">
-          <img :src="$url+'/'+item.imgSrc" />
+          <div class="img-box">
+            <img :src="$url+'/'+item.imgSrc" />
+          </div>
 
           <!-- 根据角色分配操作按钮 开始 -->
           <div class="shade" v-if="item.publish==='yes'">
@@ -109,7 +111,7 @@
         </TabPane>
 
         <TabPane label="Api接口" tab="tab1" index="4">
-          <ApiEdition :content="bidData" style="height:450px"/>
+          <ApiEdition :content="bidData" style="height:450px" />
         </TabPane>
         <TabPane v-if="bidData.theme" label="Theme配置" tab="tab1">
           <ThemeEdition :content="bidData" />
@@ -170,7 +172,7 @@ export default {
     page: 1,
     content: [],
     typeArr: [],
-    cityList1: ["zll", "李四"],
+    cityList1: [],
     cityList2: [
       { name: "已发布", value: "yes" },
       { name: "待发布", value: "no" }
@@ -187,6 +189,21 @@ export default {
   },
   mounted() {
     this.author = this.$store.state.variable.user.name;
+    this.$axios
+      .get("/api/person/user")
+      .then(res => {
+        if (res.data.result) {
+          this.cityList1 = res.data.data;
+        } else {
+          this.$Message["error"]({
+            background: true,
+            content: "数据请求失败！"
+          });
+        }
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
   },
   methods: {
     handleDownload(bid) {
@@ -321,12 +338,18 @@ export default {
   .img-warp {
     position: relative;
     overflow: hidden;
-    img {
+    .img-box {
+      display: flex;
       width: 250px;
       height: 170px;
       padding: 2px;
-      // border: 1px solid #dfdfdf;
+      align-items: center;
+      img {
+        width: 100%;
+        // border: 1px solid #dfdfdf;
+      }
     }
+
     .shade p {
       position: absolute;
       top: 0;

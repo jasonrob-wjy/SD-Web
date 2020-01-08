@@ -46,7 +46,6 @@ ul,ol{
   .menu-item span {
     display: inline-block;
     overflow: hidden;
-    width: 69px;
     text-overflow: ellipsis;
     white-space: nowrap;
     vertical-align: bottom;
@@ -185,4 +184,14 @@ body .ivu-modal {
 }
 ::-webkit-scrollbar-thumb:hover{
   background-color:#45b6f7;
+}
+.content-right{
+  background-color: #fff;
+  border: 1px solid #e8eaec;
+  margin: 5px 10px;
+  margin-right: 0;
+}
+.ivu-layout-header{
+  z-index: 100;
+  overflow: hidden;
 }

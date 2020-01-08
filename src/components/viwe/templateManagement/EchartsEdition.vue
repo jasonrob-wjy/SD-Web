@@ -95,7 +95,19 @@
 
     <div class="right">
       <div class="title">
-        <span>{{title}} 展示</span>
+        <!-- <span>{{title}} 展示</span> -->
+        <div>
+          <span>主题选择：</span>
+          <Select v-model="themeType" clearable @on-change="handleQuery" style="width:100px;">
+            <Option v-for="item in themeList" :value="item.name" :label="item.name" :key="item.name">
+              <div class="clor-box">
+                <i v-for="(each,i) in item.colorArr" :key="i+'f'" :style="'background:'+each+';'"></i>
+                <span>{{item.name}}</span>
+              </div>
+            </Option>
+          </Select>
+        </div>
+
         <div>
           数据请求地址：
           <label>方式</label>
@@ -105,10 +117,11 @@
           <Tooltip max-width="330" placement="bottom-start">
             <Input
               v-model="urlValue"
+              clearable
               @on-focus="urlOnFocus"
               @on-blur="urlOnBlur"
               placeholder="请输入请求地址..."
-              style="width: 300px"
+              style="width: 260px"
             />
             <div slot="content">
               <p style="margin:10px 0;">
@@ -189,6 +202,8 @@ export default {
     urlType: "GET",
     urlValue: "",
     tooltipContent: "",
+    themeList: [],
+    themeType: "",
     cityList: [
       {
         label: "GET",
@@ -222,20 +237,48 @@ export default {
   //     return this.$refs.splits.$data.offset
   //   }
   // },
-  // watch:{
-  //   offset(val){
-  //     console.log(val);
-
-  //   }
-  // },
+  watch: {
+    // themeType(val) {
+    // }
+  },
   created() {
     this.tooltipContent = `返回的数据可以在左侧 API编辑 中查看或编辑。`;
   },
   mounted() {
     this.bid = this.$route.query.bid;
     this.getBidData();
+    this.getThemeName();
   },
   methods: {
+    // 获取某个主题
+    getTheme(name) {
+      this.themeList.forEach(item => {
+        if (item.name === name) {
+          this.theme = item;
+          this.themeType = name;
+          this.onThemeChange(item);
+        }
+      });
+    },
+    // 获取所有主题
+    getThemeName() {
+      this.$axios
+        .get("/api/chart/theme")
+        .then(res => {
+          let data = res.data.data;
+          this.themeList = data.map(item => {
+            item.colorArr = JSON.parse(item.color).slice(0, 5);
+            return item;
+          });
+        })
+        .catch(error => {
+          console.log(error);
+          this.$Message["error"]({
+            background: true,
+            content: "主题加载错误！"
+          });
+        });
+    },
     // 数据请求地址相关函数
     urlOnFocus() {
       if (!this.urlValue) {
@@ -329,6 +372,7 @@ export default {
     // },
     getBidData() {
       this.$Message.destroy();
+      this.themeType = "";
       this.$axios
         .get("/api/template/chart", { params: { bid: this.bid } })
         .then(res => {
@@ -342,10 +386,11 @@ export default {
             this.imgSrc = content.imgSrc;
             this.chartClass = content.chartClass;
             this.explain = content.explain;
-            this.$Message["success"]({
-              background: true,
-              content: "数据请求成功！"
-            });
+
+            // this.$Message["success"]({
+            //   background: true,
+            //   content: "数据请求成功！"
+            // });
             // this.$refs.template.setChart(this.option, this.data);
           } else {
             this.$Message["error"]({
@@ -363,7 +408,11 @@ export default {
     },
     // theme
     onThemeChange(data) {
-      this.theme = data ? data : this.theme;
+      if (this.themeType) {
+        let index = this.option.indexOf("\noption.color");
+        this.option =
+          this.option.slice(0, index) + `\noption.color = ${data.color};`;
+      }
       this.$refs.template.setChart(this.option, this.data, this.theme);
     },
     // data
@@ -372,11 +421,18 @@ export default {
       this.$refs.template.setChart(this.option, this.data, this.theme);
     },
 
+    handleQuery(val) {
+      if (val) {
+        this.getTheme(val);
+      } else {
+        this.getBidData();
+      }
+    },
     handleTab(val) {
       this.action = val;
     },
     handleRouter() {
-      this.$router.push({ path: "/template/chart" });
+      this.$router.push({ path: "/charts" });
     },
     handleDrawer() {
       this.drawer = !this.drawer;
@@ -426,7 +482,7 @@ export default {
       height: 100%;
     }
     .tab {
-      height: calc(100% - 46px);
+      height: calc(100% - 50px);
       ul {
         overflow-y: auto;
       }
@@ -550,6 +606,16 @@ export default {
   // background-color: #f9f2f4;
   border-radius: 4px;
   margin: 0 5px;
+}
+.clor-box {
+  i {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+  }
+  span{
+    margin-left: 5px;
+  }
 }
 </style>
 <style lang="scss">

@@ -43,8 +43,6 @@ export default {
   methods: {
     setData(data){
        this.newContent = data;
-       console.log(this.newContent);
-       
     },
     onChange(data) {
       this.$emit("on-change", data);

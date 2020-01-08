@@ -9,23 +9,21 @@
               <MenuItem name="1" to="/">
                 <Icon type="md-apps" size="16" />工作台
               </MenuItem>
-              <MenuItem name="2" to="/project">
-                <Icon type="ios-bookmarks-outline" size="16" />项目管理
+              <MenuItem name="2" to="/charts">
+                <Icon type="ios-bookmarks-outline" size="16" />可视化图谱
               </MenuItem>
-              <MenuItem name="3" to="/task">
-                <Icon type="ios-paper-outline" size="16" />任务管理
+
+              <MenuItem name="4" to="/components">
+                <Icon type="ios-people-outline" size="16" />前端组件
               </MenuItem>
-              <MenuItem name="4" to="/team">
-                <Icon type="ios-people-outline" size="16" />团队成员
+              <MenuItem name="5" to="/">
+                <Icon type="ios-folder-outline" size="16" />网站案例
               </MenuItem>
-              <MenuItem name="5" to="/file">
-                <Icon type="ios-folder-outline" size="16" />文档管理
+              <MenuItem name="7" to="/">
+                <Icon type="ios-briefcase-outline" />网站素材
               </MenuItem>
-              <MenuItem name="7" to="/template">
-                <Icon type="ios-briefcase-outline" />工具模板
-              </MenuItem>
-              <MenuItem name="6" to="/sif">
-                <Icon type="ios-construct-outline" size="16" />系统设置
+              <MenuItem name="3" to="/">
+                <Icon type="ios-paper-outline" size="16" />可视化大屏
               </MenuItem>
             </Menu>
           </div>
@@ -87,10 +85,8 @@
             </Dropdown>
             <Dropdown>
               <div class="config">
-                <img
-                  src="https://beta.vilson.xyz/static/upload/member/avatar/20191021/75133823503a44b34269b7d4161b9078.jpg"
-                />
-                <span>郑玲璐</span>
+                <img :src="$url+'/'+imgurl" />
+                <span>{{name}}</span>
               </div>
               <DropdownMenu slot="list">
                 <DropdownItem>
@@ -106,15 +102,18 @@
                   <Icon type="ios-information-circle-outline" size="16" />提 Issue
                 </DropdownItem>
                 <DropdownItem>
-                  <Icon type="ios-log-out" size="16" />退出登录
+                  <span @click="handleLogout">
+                    <Icon type="ios-log-out" size="16" />退出登录
+                  </span>
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>
         </div>
       </Header>
-
-      <router-view />
+      <!-- <transition name="show"> -->
+        <router-view />
+      <!-- </transition> -->
       <!-- <Footer class="layout-footer-center">2011-2016 &copy; TalkingData</Footer> -->
     </Layout>
   </div>
@@ -123,35 +122,34 @@
 export default {
   data() {
     return {
-      theme: "light"
+      theme: "light",
+      name: "",
+      imgurl: ""
     };
   },
 
   computed: {
-    
+    info() {
+      return this.$store.state.user.info;
+    }
+  },
+  watch: {
+    info(val) {
+      let author = val;
+      this.name = author.name;
+      this.imgurl = author.url;
+    }
   },
   mounted() {
-    //  this.axios
-    //     .post('/api/template/chart', qs.stringify(data))
-    //     .then(response => {
-    //       if (response.data.result) {
-    //         this.$Message["success"]({
-    //           background: true,
-    //           content: "数据提交成功！"
-    //         });
-    //         this.onEditorClear();
-    //       } else {
-    //         this.$Message["error"]({
-    //           background: true,
-    //           content: "数据上传失败！"
-    //         });
-    //       }
-
-    //       // this.$router.push({ path: "/Artlist" });
-    //     })
-    //     .catch(function(error) {
-    //       console.log(error);
-    //     });
+    let author = this.$store.state.user.info;
+    this.name = author.name;
+    this.imgurl = author.url;
+  },
+  methods: {
+    handleLogout() {
+      window.sessionStorage.setItem("state", false);
+      this.$router.push({ path: "/login" });
+    }
   }
 };
 </script>
