@@ -13,18 +13,18 @@
                 <Icon type="ios-bookmarks-outline" size="16" />可视化图谱
               </MenuItem>
 
-              <MenuItem name="4" to="/components">
+              <MenuItem name="3" to="/components">
                 <Icon type="ios-people-outline" size="16" />前端组件
               </MenuItem>
-              <MenuItem name="5" to="/">
-                <Icon type="ios-folder-outline" size="16" />网站案例
+              <MenuItem name="4" to="/task">
+                <Icon type="ios-folder-outline" size="16" />任务管理
               </MenuItem>
-              <MenuItem name="7" to="/">
-                <Icon type="ios-briefcase-outline" />网站素材
+             <MenuItem name="5" to="/sys">
+                <Icon type="ios-briefcase-outline" />系统管理
               </MenuItem>
-              <MenuItem name="3" to="/">
+              <!--   <MenuItem name="3" to="/">
                 <Icon type="ios-paper-outline" size="16" />可视化大屏
-              </MenuItem>
+              </MenuItem>-->
             </Menu>
           </div>
           <div class="nav">
@@ -112,7 +112,7 @@
         </div>
       </Header>
       <!-- <transition name="show"> -->
-        <router-view />
+      <router-view />
       <!-- </transition> -->
       <!-- <Footer class="layout-footer-center">2011-2016 &copy; TalkingData</Footer> -->
     </Layout>

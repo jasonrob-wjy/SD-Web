@@ -19,7 +19,7 @@ Vue.prototype.$qs = qs;
 
 //引入路由
 import router from './router/index';
-const whiteList = ['/login3'];//不需要登录能访问的path
+const whiteList = ['/task'];//不需要登录能访问的path
 router.beforeEach((to, from, next) => {
   console.log('beforeEach');
   // let userInfo = JSON.parse(sessionStorage.getItem('state'));//获取缓存看是否登录过
@@ -62,6 +62,22 @@ import 'quill/dist/quill.bubble.css'
 // Quill.register(Font, true);
 
 Vue.use(VueQuillEditor)
+
+import hljs from 'highlight.js' //导入代码高亮文件
+// import 'highlight.js/styles/monokai-sublime.css'  //导入代码高亮样式
+// import 'highlight.js/styles/tomorrow-night.css'  //导入代码高亮样式
+import 'highlight.js/styles/tomorrow.css'  //导入代码高亮样式
+//自定义一个代码高亮指令
+Vue.directive('highlight',function (el) {
+  let highlight = el.querySelectorAll('pre');
+  highlight.forEach((block)=>{
+      hljs.highlightBlock(block)
+  })
+  let highlight1 = el.querySelectorAll('.ql-editor');
+  highlight1.forEach((block)=>{
+      hljs.highlightBlock(block)
+  })
+});
 
 new Vue({
   render: h => h(App),

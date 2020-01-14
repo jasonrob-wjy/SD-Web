@@ -283,9 +283,14 @@ export default {
         });
         return;
       }
+      this.$Message.loading({
+        content: "注册中，请稍后...",
+        duration: 0
+      });
       this.$axios
         .post("/api/person/user", this.$qs.stringify(data))
         .then(res => {
+          this.$Message.destroy();
           if (res.data.result) {
             this.handleClear();
             this.$Message["success"]({
@@ -313,6 +318,7 @@ export default {
               });
             }
           }
+       
         })
         .catch(function(error) {
           console.log(error);
@@ -337,8 +343,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: url("../assets/bg1.jpg") center center no-repeat;
-  background-size: cover;
+  background: url("../assets/bg1.jpg") 100% 100% no-repeat;
   .warp {
     width: 450px;
     background: #fff;
@@ -367,7 +372,7 @@ export default {
     }
 
     > div {
-      margin: 25px 0;
+      margin: 12px 0;
       > p {
         display: flex;
         justify-content: space-between;

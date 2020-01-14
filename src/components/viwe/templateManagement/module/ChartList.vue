@@ -22,77 +22,82 @@
         <Button type="success" ghost @click.stop="setIsShow(false)">+ 新建图表</Button>
       </div>
     </div>
-    <div class="content">
-      <Card v-for="item in content" :key="item.bid">
-        <p slot="title">
-          <span
-            v-if="item.author===author"
-            class="isBj"
-            @click.stop="setIsShow(item.bid)"
-          >{{item.title}}</span>
-          <span v-else>{{item.title}}</span>
-        </p>
-        <div slot="extra" class="author">
-          <img :src="$url+'/'+item.url" />
-          <span>{{item.author}}</span>
-        </div>
-
-        <div class="img-warp">
-          <div class="img-box">
-            <img :src="$url+'/'+item.imgSrc" />
-          </div>
-
-          <!-- 根据角色分配操作按钮 开始 -->
-          <div class="shade" v-if="item.publish==='yes'">
-            <p v-if="item.chartClass==='0'">
-              <a href="javascript:void(0);" @click="handleDownload(item.bid)">使用</a>
-              <a href="javascript:void(0);" @click="handleRouter(item.bid)">编辑</a>
-            </p>
-            <p v-else>
-              <a href="javascript:void(0);" @click="handleDownload(item.bid)">查看使用</a>
-            </p>
-          </div>
-          <div class="shade" v-else>
-            <p v-if="item.author===author">
-              <a href="javascript:void(0);" @click.stop="setIsShow(item.bid)">我要发布</a>
-            </p>
-            <p class="no-publish" v-else>
-              <span href="javascript:void(0);">发布中...</span>
-            </p>
-          </div>
-          <!-- 根据角色分配操作按钮 结束 -->
-
-          <p class="edit">
-            <span>
-              <i class="fa fa-calendar"></i>
-              {{item.date}}
-            </span>
-            <span>
-              <i class="fa fa-eye"></i>
-              {{item.look}}
-            </span>
-            <span>
-              <i class="fa fa-cubes"></i>
-              {{item.type}}
-            </span>
-            <!-- <router-link :to="{ path: '/components_api/add/editor', query: { }}">编辑</router-link> -->
+    <div v-if="content">
+      <div class="content">
+        <Card v-for="item in content" :key="item.bid">
+          <p slot="title">
+            <span
+              v-if="item.author===author"
+              class="isBj"
+              @click.stop="setIsShow(item.bid)"
+            >{{item.title}}</span>
+            <span v-else>{{item.title}}</span>
           </p>
-        </div>
-      </Card>
-    </div>
-    <div class="load-more" @click="handleMore" v-if="mark">
-      <p>
-        <Icon type="ios-arrow-dropdown" size="18" />
-        <span>加载更多</span>
-        <Icon type="ios-arrow-dropdown" size="18" />
-      </p>
-    </div>
-    <div v-else class="load-more">
-      <p>
-        <span>没有更多啦！</span>
-      </p>
-    </div>
+          <div slot="extra" class="author">
+            <img :src="$url+'/'+item.url" />
+            <span>{{item.author}}</span>
+          </div>
 
+          <div class="img-warp">
+            <div class="img-box">
+              <img :src="$url+'/'+item.imgSrc" />
+            </div>
+
+            <!-- 根据角色分配操作按钮 开始 -->
+            <div class="shade" v-if="item.publish==='yes'">
+              <p v-if="item.chartClass==='0'">
+                <a href="javascript:void(0);" @click="handleDownload(item.bid)">使用</a>
+                <a href="javascript:void(0);" @click="handleRouter(item.bid)">编辑</a>
+              </p>
+              <p v-else>
+                <a href="javascript:void(0);" @click="handleDownload(item.bid)">查看使用</a>
+              </p>
+            </div>
+            <div class="shade" v-else>
+              <p v-if="item.author===author">
+                <a href="javascript:void(0);" @click.stop="setIsShow(item.bid)">我要发布</a>
+              </p>
+              <p class="no-publish" v-else>
+                <span href="javascript:void(0);">发布中...</span>
+              </p>
+            </div>
+            <!-- 根据角色分配操作按钮 结束 -->
+
+            <p class="edit">
+              <span>
+                <i class="fa fa-calendar"></i>
+                {{item.date}}
+              </span>
+              <span>
+                <i class="fa fa-eye"></i>
+                {{item.look}}
+              </span>
+              <span>
+                <i class="fa fa-cubes"></i>
+                {{item.type}}
+              </span>
+              <!-- <router-link :to="{ path: '/components_api/add/editor', query: { }}">编辑</router-link> -->
+            </p>
+          </div>
+        </Card>
+      </div>
+      <div class="load-more" @click="handleMore" v-if="mark">
+        <p>
+          <Icon type="ios-arrow-dropdown" size="18" />
+          <span>加载更多</span>
+          <Icon type="ios-arrow-dropdown" size="18" />
+        </p>
+      </div>
+      <div v-else class="load-more">
+        <p>
+          <span>没有更多啦！</span>
+        </p>
+      </div>
+    </div>
+    <!-- 加载动画 -->
+    <div v-else class="web-box demo-spin-col">
+      <i class="fa fa-spinner fa-pulse"></i>
+    </div>
     <!-- echarts使用弹出框 -->
     <Modal v-if="bidData.chartClass==='0'" v-model="isDown" footer-hide width="60%">
       <p slot="header">
@@ -170,7 +175,7 @@ export default {
     mark: true,
     author: "",
     page: 1,
-    content: [],
+    content: null,
     typeArr: [],
     cityList1: [],
     cityList2: [
@@ -421,6 +426,7 @@ export default {
     }
   }
 }
+
 </style>
 <style lang="scss" >
 .ivu-card-head {

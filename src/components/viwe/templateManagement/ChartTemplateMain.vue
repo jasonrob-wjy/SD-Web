@@ -1,6 +1,7 @@
 <template>
   <Layout>
-    <Sider collapsible :collapsed-width="78" v-model="isCollapsed" :style="{background: '#fff'}">
+    <!-- collapsible -->
+    <Sider  :collapsed-width="78" v-model="isCollapsed" :style="{background: '#fff'}">
       <Menu active-name="1-0" theme="light" width="auto" :class="menuitemClasses">
         <MenuItem name="1-0" @click.native="onQuery('',true)">
           <!-- <i class="fa fa-pie-chart"></i> -->
@@ -31,7 +32,7 @@ export default {
     return {
       isCollapsed: false,
       pageNo: 1,
-      pageSize: 12,
+      pageSize: 18,
       typeVal: "",
       content: [],
       typeCount: 0,

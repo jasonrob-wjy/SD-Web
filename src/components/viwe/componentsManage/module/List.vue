@@ -26,70 +26,75 @@
         <Button type="success" ghost @click.stop="setIsShow(false)">+ 新建组件</Button>
       </div>
     </div>
-    <div class="content">
-      <div v-for="item in content" :key="item.bid" class="item">
-        <div class="img-warp">
-          <div class="img-box">
-            <img :src="$url+'/'+item.imgSrc" />
-            <!-- 根据角色分配操作按钮 开始 -->
-            <div class="shade" v-if="item.publish==='yes'">
+    <div v-if="content">
+      <div class="content">
+        <div v-for="item in content" :key="item.bid" class="item">
+          <div class="img-warp">
+            <div class="img-box">
+              <img :src="$url+'/'+item.imgSrc" />
+              <!-- 根据角色分配操作按钮 开始 -->
+              <div class="shade" v-if="item.publish==='yes'">
+                <p>
+                  <a href="javascript:void(0);" @click="getBidData(item.bid)">查看详情</a>
+                </p>
+              </div>
+              <div class="shade" v-else>
+                <p v-if="item.author===author">
+                  <a href="javascript:void(0);" @click.stop="setIsShow(item.bid)">我要发布</a>
+                </p>
+                <p class="no-publish" v-else>
+                  <span href="javascript:void(0);">发布中...</span>
+                </p>
+              </div>
+              <!-- 根据角色分配操作按钮 结束 -->
+            </div>
+            <div class="jieshi">
+              <div>
+                <span
+                  v-if="item.author===author"
+                  class="isBj"
+                  @click.stop="setIsShow(item.bid)"
+                >{{item.title}}</span>
+                <span v-else>{{item.title}}</span>
+              </div>
               <p>
-                <a href="javascript:void(0);" @click="getBidData(item.bid)">查看详情</a>
+                <span>{{item.brief}}</span>
               </p>
             </div>
-            <div class="shade" v-else>
-              <p v-if="item.author===author">
-                <a href="javascript:void(0);" @click.stop="setIsShow(item.bid)">我要发布</a>
-              </p>
-              <p class="no-publish" v-else>
-                <span href="javascript:void(0);">发布中...</span>
-              </p>
+            <div class="edit">
+              <span>
+                <i class="fa fa-calendar"></i>
+                {{item.date}}
+              </span>
+              <span>
+                <i class="fa fa-eye"></i>
+                {{item.look}}
+              </span>
+              <span class="author-img">
+                <img :src="$url+'/'+item.url" />
+                <span>{{item.author}}</span>
+              </span>
+              <!-- <router-link :to="{ path: '/components_api/add/editor', query: { }}">编辑</router-link> -->
             </div>
-            <!-- 根据角色分配操作按钮 结束 -->
-          </div>
-
-          <div class="jieshi">
-            <div>
-              <span
-                v-if="item.author===author"
-                class="isBj"
-                @click.stop="setIsShow(item.bid)"
-              >{{item.title}}</span>
-              <span v-else>{{item.title}}</span>
-            </div>
-            <p>
-              <span>{{item.brief}}</span>
-            </p>
-          </div>
-          <div class="edit">
-            <span>
-              <i class="fa fa-calendar"></i>
-              {{item.date}}
-            </span>
-            <span>
-              <i class="fa fa-eye"></i>
-              {{item.look}}
-            </span>
-            <span class="author-img">
-              <img :src="$url+'/'+item.url" />
-              <span>{{item.author}}</span>
-            </span>
-            <!-- <router-link :to="{ path: '/components_api/add/editor', query: { }}">编辑</router-link> -->
           </div>
         </div>
       </div>
+      <div class="load-more" @click="handleMore" v-if="mark">
+        <p>
+          <Icon type="ios-arrow-dropdown" size="18" />
+          <span>加载更多</span>
+          <Icon type="ios-arrow-dropdown" size="18" />
+        </p>
+      </div>
+      <div v-else class="load-more">
+        <p>
+          <span>没有更多啦！</span>
+        </p>
+      </div>
     </div>
-    <div class="load-more" @click="handleMore" v-if="mark">
-      <p>
-        <Icon type="ios-arrow-dropdown" size="18" />
-        <span>加载更多</span>
-        <Icon type="ios-arrow-dropdown" size="18" />
-      </p>
-    </div>
-    <div v-else class="load-more">
-      <p>
-        <span>没有更多啦！</span>
-      </p>
+    <!-- 加载动画 -->
+    <div v-else class="web-box demo-spin-col">
+      <i class="fa fa-spinner fa-pulse"></i>
     </div>
     <!-- 新建Bug -->
     <AddComponent :typeArr="typeArr" :classArr="cityList3" ref="addChart" @on-change="onChange" />
@@ -109,7 +114,7 @@ export default {
     mark: true,
     author: "",
     page: 1,
-    content: [],
+    content: null,
     typeArr: [],
     cityList1: [],
     cityList2: [
@@ -152,6 +157,10 @@ export default {
     // },
     //使用相关
     getBidData(bid) {
+      this.$Message.loading({
+        content: "加载中，请稍后...",
+        duration: 0
+      });
       this.bid = bid;
       this.$axios
         .get("/api/template/component", { params: { bid } })
@@ -165,6 +174,7 @@ export default {
               content: "数据请求失败！"
             });
           }
+          this.$Message.destroy();
         });
     },
     handleQuery() {

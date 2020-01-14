@@ -1,11 +1,14 @@
 <template>
   <div>
-    <Table border :columns="columns12" :data="data6" ref="table">
-      <template slot-scope="{ row }" slot="name">
-        <strong>{{ row.name }}</strong>
+    <Table border :columns="columns" :data="content" ref="table">
+      <template slot-scope="{ row }" slot="title">
+        <strong>{{ row.title }}</strong>
       </template>
-      <template slot-scope="{ row }" slot="name1">
-        <p>{{ row.name+'asfsdgvdsfv' }}</p>
+      <template slot-scope="{ row }" slot="project">
+        <p>{{ row.project }}</p>
+      </template>
+      <template slot-scope="{ row }" slot="level">
+        <p>{{ row.level }}</p>
       </template>
       <template slot-scope="{ row, index }" slot="action">
         <Tooltip content="解决Bug" placement="top" theme="light">
@@ -13,12 +16,11 @@
             type="md-checkbox-outline"
             size="22"
             class="icon-active"
-          
-          /> -->
-             <i class="fa fa-check-square-o fa-lg"  @click="setSolveBugIsShow(index)"></i>
+          />-->
+          <i class="fa fa-check-square-o fa-lg" @click="setSolveBugIsShow(index)"></i>
         </Tooltip>
         <Tooltip content="编辑Bug" placement="top" theme="light">
-         <i class="fa fa-edit fa-lg"></i>
+          <i class="fa fa-edit fa-lg"></i>
         </Tooltip>
         <Tooltip content="查看详情" placement="top" theme="light">
           <Icon
@@ -42,69 +44,50 @@
 export default {
   data() {
     return {
-      columns12: [
+      content:[],
+      columns: [
         {
-          title: "项目",
-          slot: "name"
+          title: "任务标题",
+          slot: "title"
+        },
+        {
+          title: "所属项目",
+          slot: "project"
         },
         {
           title: "级别",
-          slot: "name1"
+          slot: "level"
         },
-
-        {
-          title: "Bug标题",
-          slot: "name"
-        },
-
         {
           title: "指派给",
-          key: "address"
+          key: "assign"
         },
         {
           title: "创建者",
-          key: "address"
+          key: "author"
         },
         {
           title: "创建日期",
-          key: "address"
+          key: "date"
         },
         {
           title: "状态",
-          key: "age",
+          key: "state",
           width: 100
         },
         {
           title: "操作",
           slot: "action",
-          width: 120,
+          width: 120
         }
       ],
-      data6: [
-        {
-          name: "John Brown",
-          age: 18,
-          address: "New York No. 1 Lake Park"
-        },
-        {
-          name: "Jim Green",
-          age: 24,
-          address: "London No. 1 Lake Park"
-        },
-        {
-          name: "Joe Black",
-          age: 30,
-          address: "Sydney No. 1 Lake Park"
-        },
-        {
-          name: "Jon Snow",
-          age: 26,
-          address: "Ottawa No. 2 Lake Park"
-        }
-      ]
+     
     };
   },
   methods: {
+    setData(data){
+      this.content = data;
+    },
     setSolveBugIsShow() {
       this.$store.commit("setSolveBugIsShow", true);
     },

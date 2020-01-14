@@ -141,7 +141,7 @@
       </div>
       <EchartsTemplate ref="template" />
       <!-- 左侧抽屉 主题样式 -->
-      <Drawer
+      <!-- <Drawer
         title="主题选择"
         :closable="true"
         :mask-style="{background: 'transparent'}"
@@ -162,7 +162,7 @@
             <span>Windows</span>
           </Radio>
         </RadioGroup>
-      </Drawer>
+      </Drawer> -->
       <!-- 按钮 -->
       <div class="handle-box">
         <div class="button">

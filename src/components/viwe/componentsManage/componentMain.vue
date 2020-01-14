@@ -1,6 +1,6 @@
 <template>
   <Layout>
-    <Sider collapsible :collapsed-width="78" v-model="isCollapsed" :style="{background: '#fff'}">
+    <Sider :collapsed-width="78" v-model="isCollapsed" :style="{background: '#fff'}">
       <Menu active-name="1-0" theme="light" width="auto" :class="menuitemClasses">
         <MenuItem name="1-0" @click.native="onQuery('',true)">
           <i class="fa fa-pie-component"></i>
@@ -95,9 +95,9 @@ export default {
     onDetail(obj) {
       this.detail = obj;
     },
-    onIsDetail(val){
+    onIsDetail(val) {
       this.detail.mark = val;
-       this.getData({});
+      this.getData({});
     },
     onQuery(obj, mark) {
       this.detail.mark = false;

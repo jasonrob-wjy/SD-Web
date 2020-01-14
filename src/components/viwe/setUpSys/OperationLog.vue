@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- <Card title="导出EXCEL"> -->
-    <div class="ivu-alert ivu-alert-info ivu-alert-with-icon">
+    <!-- <div class="ivu-alert ivu-alert-info ivu-alert-with-icon">
       <span class="ivu-alert-icon">
         <i class="ivu-icon ivu-icon-ios-information-circle"></i>
       </span>
@@ -14,7 +14,7 @@
         注意：非 template/render 模式下，需使用
         注意：非 template/render 模式下，需使用
       </span>
-    </div>
+    </div> -->
     <Card shadow>
       <div class="search">
         <div class="margin-right">
