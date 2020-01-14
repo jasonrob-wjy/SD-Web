@@ -25,7 +25,7 @@
           <Icon type="md-checkbox-outline" size="22" />指派提交
         </h3>
       </div>
-      <div class="warp">
+      <div class="warp-box">
         <p>
           <label>所属项目：</label>
           <span>项目1</span>
@@ -83,6 +83,7 @@ export default {
   data() {
     return {
       assign: false,
+      model12:'',
       cityList: [
         {
           value: "代码错误",
@@ -134,7 +135,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.warp {
+.warp-box {
   p,
   > div {
     padding: 10px 10px;

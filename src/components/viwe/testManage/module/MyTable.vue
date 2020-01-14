@@ -1,62 +1,61 @@
 <template>
   <div>
     <Table border :columns="columns" :data="content" ref="table">
-      <template slot-scope="{ row }" slot="title">
+      <!-- <template slot-scope="{ row }" slot="title">
         <strong>{{ row.title }}</strong>
-      </template>
-      <template slot-scope="{ row }" slot="project">
-        <p>{{ row.project }}</p>
-      </template>
+      </template>-->
+
       <template slot-scope="{ row }" slot="level">
-        <p>{{ row.level }}</p>
+        <p class="p-warp" v-if="row.level==='高'">
+          <span class="level l1">{{ row.level }}</span>（急需处理）
+        </p>
+        <p class="p-warp" v-if="row.level==='中'">
+          <span class="level l2">{{ row.level }}</span>（暂缓处理）
+        </p>
+        <p class="p-warp" v-if="row.level==='低'">
+          <span class="level l3">{{ row.level }}</span>（暂不处理）
+        </p>
       </template>
-      <template slot-scope="{ row, index }" slot="action">
-        <Tooltip content="解决Bug" placement="top" theme="light">
+      <template slot-scope="{ row }" slot="state">
+        <p>{{ row.state }}</p>
+      </template>
+      <template slot-scope="{ row }" slot="action">
+        <Tooltip content="完成任务" placement="top" theme="light">
           <!-- <Icon
             type="md-checkbox-outline"
             size="22"
             class="icon-active"
           />-->
-          <i class="fa fa-check-square-o fa-lg" @click="setSolveBugIsShow(index)"></i>
+          <i class="fa fa-check-square-o fa-lg" @click="setSolveBugIsShow"></i>
         </Tooltip>
-        <Tooltip content="编辑Bug" placement="top" theme="light">
-          <i class="fa fa-edit fa-lg"></i>
+        <Tooltip content="编辑任务" placement="top" theme="light">
+          <i class="fa fa-edit fa-lg" @click="setEditorIsShow(row)"></i>
         </Tooltip>
         <Tooltip content="查看详情" placement="top" theme="light">
           <Icon
             type="ios-log-in"
             size="22"
-            @click.stop="setDetailsIsShow(index)"
+            @click.stop="setDetailsIsShow(row)"
             class="icon-active icon-size"
           />
         </Tooltip>
       </template>
     </Table>
-
-    <div style="margin: 10px;overflow: hidden">
-      <div style="float: right;">
-        <Page :total="100" :current="1" @on-change="changePage"></Page>
-      </div>
-    </div>
   </div>
 </template>
 <script>
 export default {
   data() {
     return {
-      content:[],
+      content: [],
       columns: [
         {
           title: "任务标题",
-          slot: "title"
+          key: "title"
         },
         {
           title: "所属项目",
-          slot: "project"
-        },
-        {
-          title: "级别",
-          slot: "level"
+          key: "project"
         },
         {
           title: "指派给",
@@ -70,32 +69,37 @@ export default {
           title: "创建日期",
           key: "date"
         },
+           {
+          title: "级别",
+          slot: "level"
+        },
         {
           title: "状态",
-          key: "state",
-          width: 100
+          slot: "state"
+          // width: 100
         },
         {
           title: "操作",
           slot: "action",
           width: 120
         }
-      ],
-     
+      ]
     };
   },
   methods: {
-    setData(data){
+    setData(data) {
       this.content = data;
     },
     setSolveBugIsShow() {
       this.$store.commit("setSolveBugIsShow", true);
     },
-    setOneBugIsShow() {
+    setEditorIsShow(row) {
       this.$store.commit("setOneBugIsShow", true);
+      this.$store.commit("setRowData", row);
     },
-    setDetailsIsShow() {
+    setDetailsIsShow(row) {
       this.$store.commit("setDetailsIsShow", true);
+      this.$store.commit("setRowData", row);
     }
     // show(index) {
     //   this.$Modal.info({
@@ -119,5 +123,27 @@ export default {
 }
 .icon-size {
   font-weight: 600;
+}
+.p-warp {
+  display: flex;
+   font-size: 12px;
+}
+.level {
+  display: block;
+  padding: 1px 4px;
+  margin-bottom: 1px;
+  border-radius: 100%;
+}
+.l1 {
+  color: #d50000;
+  border: 2px solid #d50000;
+}
+.l2 {
+  color: #ff9800;
+  border: 2px solid #ff9800;
+}
+.l3 {
+  color: #2098ee;
+  border: 2px solid #2098ee;
 }
 </style>

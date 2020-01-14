@@ -113,7 +113,7 @@ export default {
     onQuery(obj, mark) {
       // this.detail.mark = false;
       this.pageNo = 1;
-      this.$refs.task.getData(obj)
+      this.$refs.task.getData(obj,this.pageNo)
       // if (mark) {
       //   this.typeVal = obj;
       //   // this.getData({});

@@ -1,8 +1,12 @@
 const state = {
   positionIsShow: false,
-  user: { name: 'zll',url:'' }
+  user: { name: 'zll', url: '' },
+  rowData: null
 }
 const mutations = {
+  setRowData(state, data) {
+    state.rowData = data;
+  },
   setPositionIsShow(state, data) {
     state.positionIsShow = data;
   },

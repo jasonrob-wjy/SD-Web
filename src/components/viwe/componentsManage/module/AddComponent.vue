@@ -268,7 +268,6 @@ export default {
     },
 
     handleShow() {
-      this.handleClear();
       this.$store.commit("setOneBugIsShow", false);
       this.$emit("on-change");
     },

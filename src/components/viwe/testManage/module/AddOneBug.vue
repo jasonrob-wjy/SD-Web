@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Modal v-model="oneBugIsShow" width="70%" @on-cancel="handleShow">
+    <Modal v-model="isShow" width="70%" @on-cancel="handleShow">
       <div slot="header">
         <h3>
           <Icon type="ios-create-outline" size="22" />新建任务
@@ -9,7 +9,7 @@
       <div class="warp">
         <p>
           <label>任务标题：</label>
-          <Input v-model="title" placeholder="请输入标题..." style="width: 300px" />
+          <Input v-model="title" placeholder="请输入标题..." style="width: 300px; margin-right: 40px;" />
           <label>所属项目：</label>
           <Select v-model="project" style="width:300px">
             <Option
@@ -21,11 +21,11 @@
         </p>
         <p>
           <label>当前指派：</label>
-          <Select v-model="assign" style="width:300px">
+          <Select v-model="assign" style="width:300px; margin-right: 40px;">
             <Option v-for="item in assignArr" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
           <label>任务类型：</label>
-          <Select v-model="type" style="width:300px">
+          <Select v-model="type" style="width:300px;">
             <Option v-for="item in typeArr" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
         </p>
@@ -56,7 +56,7 @@
           >
             <Button icon="ios-cloud-upload-outline">附件上传</Button>
           </Upload>
-          <span>可上传文件、文本、图片等</span>
+          <em style="color:red;font-size:12px;" v-if="!uploadList.length">（可上传文件、文本、图片等）</em>
         </div>
         <div>
           <label>任务内容：</label>
@@ -70,7 +70,7 @@
       <div slot="footer">
         <Button type="success" @click="handleSubmit('yes')">提交</Button>
         <!-- <Button type="info" @click="handleSubmit('no')">保存草稿</Button> -->
-        <Button type="primary" @click.stop="handleShow">关闭</Button>
+        <Button type="primary" @click="handleShow">关闭</Button>
       </div>
     </Modal>
   </div>
@@ -99,7 +99,7 @@ export default {
 
       uploadList: [],
       // ----------------
-      isShow: false,
+      // isShow: false,
       value: "asd",
       projectArr: [
         {
@@ -151,21 +151,56 @@ export default {
     };
   },
   computed: {
-    oneBugIsShow() {
-      return this.$store.state.show.oneBugIsShow;
+    isShow() {
+      let data = this.$store.state.variable.rowData;
+      let state = this.$store.state.show.oneBugIsShow;
+      if (state && data) {
+        console.log(data);
+        
+        this.getBidData(data);
+      }
+      return state;
     }
   },
-  watch: {
-    oneBugIsShow(val) {
-      this.isShow = val;
-    }
-  },
+  // watch: {
+  //   isShow(val) {
+
+  //   }
+  // },
   mounted() {
     let author = this.$store.state.user.info;
     this.author = author.name;
     this.url = author.url;
   },
   methods: {
+    clearData() {
+      this.title = "";
+      this.project = "";
+      this.assign = "";
+      this.level = "高";
+      this.url = "";
+      // date: this.date,
+      this.state = "待处理";
+      this.type = "";
+      this.remarks = "";
+      this.step = `<p>[步骤]</p><p><br></p><p><br></p><p>[结果]</p><p><br></p><p><br></p><p>[期望]</p><p><br></p><p><br></p><p><br></p><p><br></p>`;
+       this.$refs.upload.fileList = [];
+    },
+    getBidData(data) {
+      this.title = data.title;
+      this.project = data.project;
+      this.assign = data.assign;
+      this.level = data.level;
+      this.author = data.author;
+      this.url = data.url;
+      // date: this.date,
+      this.state = data.state;
+      this.type = data.type;
+      this.remarks = data.remarks;
+      this.step = data.step;
+      this.$refs.upload.fileList = JSON.parse(data.appendix);
+      // this.isShow = true;
+    },
     handleSubmit(val) {
       this.$Message.destroy();
       // 判断输入内容是否为空
@@ -231,6 +266,7 @@ export default {
                 background: true,
                 content: "数据提交成功！"
               });
+             
             } else {
               this.$Message["error"]({
                 background: true,
@@ -259,8 +295,13 @@ export default {
         });
         let uploadList = this.$refs.upload.fileList;
         this.uploadList = [];
+
         uploadList.forEach(item => {
-          this.uploadList.push(item.response.fileInfo);
+          if (item.response) {
+            this.uploadList.push(item.response.fileInfo);
+          } else {
+            this.uploadList.push(item);
+          }
         });
       } else {
         this.$Message["error"]({
@@ -309,20 +350,22 @@ export default {
           console.log(error);
         });
     },
-
-    // -------------
     handleShow() {
+      this.clearData();
+       this.$store.commit("setRowData", null);
       this.$store.commit("setOneBugIsShow", false);
-    },
-    show(index) {
-      this.$Modal.info({
-        title: "User Info",
-        content: `Name：${this.data6[index].name}<br>Age：${this.data6[index].age}<br>Address：${this.data6[index].address}`
-      });
-    },
-    remove(index) {
-      this.data6.splice(index, 1);
     }
+    // -------------
+
+    // show(index) {
+    //   this.$Modal.info({
+    //     title: "User Info",
+    //     content: `Name：${this.data6[index].name}<br>Age：${this.data6[index].age}<br>Address：${this.data6[index].address}`
+    //   });
+    // },
+    // remove(index) {
+    //   this.data6.splice(index, 1);
+    // }
   }
 };
 </script>
@@ -337,7 +380,7 @@ export default {
       width: 75px;
     }
     > div {
-      margin-right: 40px;
+      margin-right: 10px;
     }
     .editor {
       width: 86%;
@@ -351,8 +394,10 @@ export default {
   align-items: center;
   ul {
     display: flex;
+    margin: 0;
     li {
       margin-left: 12px;
+      color: cadetblue;
     }
   }
 }

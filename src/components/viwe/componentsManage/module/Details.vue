@@ -47,7 +47,6 @@ export default {
   watch: {
     content(data) {
       this.newData = data;
-      console.log(this.newData);
     }
   },
   mounted() {

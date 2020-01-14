@@ -153,7 +153,6 @@ export default {
       this.bid = "";
       this.title = "";
       this.type = "";
-      this.author = "";
       this.option = "";
       this.data = "";
       this.url = "";

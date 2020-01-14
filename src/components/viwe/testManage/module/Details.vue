@@ -6,53 +6,55 @@
           <Icon type="ios-create-outline" size="22" />详情内容
         </h3>
       </div>
-      <div class="warp">
+      <div class="warp-box">
         <div>
-          <label>项目名称：</label>
-          <span>sdfvsdfvbsdf</span>
+          <label>任务标题：</label>
+          <span>{{title}}</span>
         </div>
         <div>
           <p>
-            <label>Bug标题：</label>
-            <span>sdvsdbfcgn</span>
+            <label>所属项目：</label>
+            <span>{{project}}</span>
           </p>
           <p>
-            <label>Bug类型：</label>
-            <span>sdcvsavsdsd</span>
+            <label>任务类型：</label>
+            <span>{{type}}</span>
           </p>
         </div>
 
         <div>
           <p>
             <label>创建者：</label>
-            <span>啊是到v水电费</span>
+            <span>{{author}}</span>
           </p>
           <p>
             <label>创建时间：</label>
-            <span>xcv xcb vcg</span>
+            <span>{{date}}</span>
           </p>
         </div>
         <div>
           <p>
             <label>指派给：</label>
-            <span>xcv xcb vcg</span>
+            <span>{{assign}}</span>
           </p>
           <p>
             <label>状态：</label>
-            <span>xcv xcb vcg</span>
+            <span>{{state}}</span>
           </p>
         </div>
         <div>
           <label>附件内容：</label>
-          <span>可上传文件、文本、图片等</span>
+          <ul class="fj" v-for="item in appendix" :key="item.name">
+            <li>{{item.name}}</li>
+          </ul>
         </div>
         <div>
-          <label>重现步骤：</label>
-          <span>asdvsdfbdfnggf</span>
+          <label>任务内容：</label>
+          <div v-html="step"></div>
         </div>
         <div>
           <label>备注：</label>
-          <span>dfbdfnggfvmfhg</span>
+          <span>{{remarks}}</span>
         </div>
       </div>
       <div slot="footer">
@@ -64,7 +66,22 @@
 <script>
 export default {
   data() {
-    return {};
+    return {
+      title: "",
+      project: "",
+      assign: "",
+      level: "高",
+      author: "",
+      url: "",
+      date: "",
+      state: "待处理",
+      type: "",
+      remarks: "",
+      appendix: "",
+      step: "",
+
+      uploadList: []
+    };
   },
   // watch: {
   //   oneBugIsShow(val) {
@@ -74,10 +91,30 @@ export default {
   // },
   computed: {
     detailsIsShow() {
-      return this.$store.state.show.detailsIsShow;
+      let data = this.$store.state.variable.rowData;
+      let state = this.$store.state.show.detailsIsShow;
+      if (state && data) {
+        this.getData(data);
+      }
+      return state;
     }
   },
   methods: {
+    getData(data) {
+      this.title = data.title;
+      this.project = data.project;
+      this.assign = data.assign;
+      this.level = data.level;
+      this.author = data.author;
+      this.url = data.url;
+      this.date = data.date;
+      this.state = data.state;
+      this.type = data.type;
+      this.remarks = data.remarks;
+      this.step = data.step;
+      this.appendix = JSON.parse(data.appendix);
+      // this.isShow = true;
+    },
     handleShow() {
       this.$store.commit("setDetailsIsShow", false);
     }
@@ -85,7 +122,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.warp {
+.warp-box {
   > div {
     padding: 10px 10px;
     display: flex;
@@ -96,9 +133,16 @@ export default {
     > p {
       width: 50%;
     }
-  
+
     .editor {
       width: 86%;
+    }
+  }
+  .fj{
+    li{
+      margin-right: 15px;
+      padding: 3px 6px;
+      color: cadetblue;
     }
   }
 }
