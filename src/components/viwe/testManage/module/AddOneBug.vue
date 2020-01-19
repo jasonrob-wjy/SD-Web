@@ -20,7 +20,7 @@
           </Select>
         </p>
         <p>
-          <label>当前指派：</label>
+          <label>指派给：</label>
           <Select v-model="assign" style="width:300px; margin-right: 40px;">
             <Option v-for="item in assignArr" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
@@ -29,6 +29,12 @@
             <Option v-for="item in typeArr" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
         </p>
+        <div>
+          <label>抄送给：</label>
+          <Select v-model="send" filterable multiple style="max-width:715px">
+            <Option v-for="item in assignArr" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          </Select>
+        </div>
         <p>
           <label>优先级别：</label>
           <RadioGroup v-model="level">
@@ -68,7 +74,7 @@
         </div>
       </div>
       <div slot="footer">
-        <Button type="success" @click="handleSubmit('yes')">提交</Button>
+        <Button type="success" @click="handleSubmit">提交</Button>
         <!-- <Button type="info" @click="handleSubmit('no')">保存草稿</Button> -->
         <Button type="primary" @click="handleShow">关闭</Button>
       </div>
@@ -81,26 +87,26 @@ export default {
   components: {
     QuillEditor
   },
-
   data() {
     return {
       title: "",
       project: "",
       assign: "",
+      send: [],
       level: "高",
       author: "",
       url: "",
       date: "",
+      bid: "",
       state: "待处理",
       type: "",
       remarks: "",
       appendix: "",
       step: `<p>[步骤]</p><p><br></p><p><br></p><p>[结果]</p><p><br></p><p><br></p><p>[期望]</p><p><br></p><p><br></p><p><br></p><p><br></p>`,
-
       uploadList: [],
       // ----------------
-      // isShow: false,
-      value: "asd",
+      isShow: true,
+      // value: "asd",
       projectArr: [
         {
           value: "项目1",
@@ -112,14 +118,14 @@ export default {
         }
       ],
       assignArr: [
-        {
-          value: "郑玲璐",
-          label: "郑玲璐"
-        },
-        {
-          value: "李学东",
-          label: "李学东"
-        }
+        // {
+        //   value: "郑玲璐",
+        //   label: "郑玲璐"
+        // },
+        // {
+        //   value: "李学东",
+        //   label: "李学东"
+        // }
       ],
       typeArr: [
         {
@@ -150,24 +156,33 @@ export default {
       model1: ""
     };
   },
-  computed: {
-    isShow() {
-      let data = this.$store.state.variable.rowData;
-      let state = this.$store.state.show.oneBugIsShow;
-      if (state && data) {
-        console.log(data);
-        
-        this.getBidData(data);
-      }
-      return state;
-    }
-  },
-  // watch: {
-  //   isShow(val) {
-
+  // computed: {
+  //   isShow() {
+  //     let data = this.$store.state.variable.rowData;
+  //     let state = this.$store.state.show.oneBugIsShow;
+  //     if (state && data) {
+  //       this.$nextTick(() => {
+  //         this.clearData();
+  //         this.getBidData(data);
+  //       });
+  //     } else {
+  //       this.$store.commit("setRowData", {});
+  //     };
+  //     return state;
   //   }
   // },
+  props: ["value", "content"],
+  watch: {
+    isShow() {
+      this.handleShow();
+    }
+  },
+
   mounted() {
+    this.assignArr = this.value;
+    if (this.content) {
+      this.getBidData(this.content);
+    }
     let author = this.$store.state.user.info;
     this.author = author.name;
     this.url = author.url;
@@ -179,12 +194,14 @@ export default {
       this.assign = "";
       this.level = "高";
       this.url = "";
+      this.send = [];
       // date: this.date,
       this.state = "待处理";
       this.type = "";
+      this.bid = "";
       this.remarks = "";
       this.step = `<p>[步骤]</p><p><br></p><p><br></p><p>[结果]</p><p><br></p><p><br></p><p>[期望]</p><p><br></p><p><br></p><p><br></p><p><br></p>`;
-       this.$refs.upload.fileList = [];
+      this.$refs.upload.fileList = [];
     },
     getBidData(data) {
       this.title = data.title;
@@ -193,11 +210,14 @@ export default {
       this.level = data.level;
       this.author = data.author;
       this.url = data.url;
+      this.bid = data.bid;
+      this.send = JSON.parse(data.send);
       // date: this.date,
       this.state = data.state;
       this.type = data.type;
       this.remarks = data.remarks;
       this.step = data.step;
+       this. uploadList= JSON.parse(data.appendix);
       this.$refs.upload.fileList = JSON.parse(data.appendix);
       // this.isShow = true;
     },
@@ -207,14 +227,14 @@ export default {
       if (!this.title) {
         this.$Message["error"]({
           background: true,
-          content: "图谱标题不得为空！"
+          content: "任务标题不得为空！"
         });
         return;
       }
       if (!this.type) {
         this.$Message["error"]({
           background: true,
-          content: "图谱类型不得为空！"
+          content: "任务类型不得为空！"
         });
         return;
       }
@@ -231,21 +251,20 @@ export default {
         type: this.type,
         remarks: this.remarks,
         step: this.step,
+        send: JSON.stringify(this.send),
         appendix: JSON.stringify(this.uploadList)
       };
       //判断更新数据还是添加数据
       if (this.bid) {
         this.$axios
-          .put(
-            "/api/template/component",
-            this.$qs.stringify({ bid: this.bid, data })
-          )
+          .put("/api/task", this.$qs.stringify({ bid: this.bid, data }))
           .then(res => {
             if (res.data.result) {
               this.$Message["success"]({
                 background: true,
                 content: "数据提交成功！"
               });
+              this.handleShow();
             } else {
               this.$Message["error"]({
                 background: true,
@@ -266,7 +285,7 @@ export default {
                 background: true,
                 content: "数据提交成功！"
               });
-             
+              this.handleShow();
             } else {
               this.$Message["error"]({
                 background: true,
@@ -279,8 +298,6 @@ export default {
             console.log(error);
           });
       }
-      this.handleShow();
-      this.$emit("on-change");
     },
     onEditorChange(quill) {
       // console.log(quill);
@@ -351,9 +368,10 @@ export default {
         });
     },
     handleShow() {
-      this.clearData();
-       this.$store.commit("setRowData", null);
-      this.$store.commit("setOneBugIsShow", false);
+      this.$emit("on-change", "b");
+      // this.clearData();
+      // this.$store.commit("setRowData", null);
+      // this.$store.commit("setOneBugIsShow", false);
     }
     // -------------
 

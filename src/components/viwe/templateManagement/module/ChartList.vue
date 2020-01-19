@@ -22,7 +22,7 @@
         <Button type="success" ghost @click.stop="setIsShow(false)">+ 新建图表</Button>
       </div>
     </div>
-    <div v-if="content">
+    <div v-if="content.length">
       <div class="content">
         <Card v-for="item in content" :key="item.bid">
           <p slot="title">
@@ -175,7 +175,7 @@ export default {
     mark: true,
     author: "",
     page: 1,
-    content: null,
+    content: [],
     typeArr: [],
     cityList1: [],
     cityList2: [

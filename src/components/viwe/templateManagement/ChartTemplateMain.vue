@@ -1,13 +1,18 @@
 <template>
   <Layout>
     <!-- collapsible -->
-    <Sider  :collapsed-width="78" v-model="isCollapsed" :style="{background: '#fff'}">
+    <Sider :collapsed-width="78" v-model="isCollapsed" :style="{background: '#fff'}">
       <Menu active-name="1-0" theme="light" width="auto" :class="menuitemClasses">
         <MenuItem name="1-0" @click.native="onQuery('',true)">
           <!-- <i class="fa fa-pie-chart"></i> -->
           <span>全部组件（{{typeCount}}）</span>
         </MenuItem>
-        <MenuItem v-for="(item,i) in typeArr" :key="i+'q'" :name="'1-'+(i+1)" @click.native="onQuery(item.type,true)">
+        <MenuItem
+          v-for="(item,i) in typeArr"
+          :key="i+'q'"
+          :name="'1-'+(i+1)"
+          @click.native="onQuery(item.type,true)"
+        >
           <!-- <i class="fa fa-pie-chart"></i> -->
           <span>{{item.type}}（{{item.count}}）</span>
         </MenuItem>
@@ -31,6 +36,7 @@ export default {
   data() {
     return {
       isCollapsed: false,
+      isOk: true,
       pageNo: 1,
       pageSize: 18,
       typeVal: "",
@@ -90,53 +96,62 @@ export default {
       this.getData({}, "page");
     },
     getData(obj, page) {
-      let data = {
-        pageNo: this.pageNo,
-        pageSize: this.pageSize
-      };
+      this.$Message.destroy();
+      this.$Message.loading({
+        content: "加载中，请稍后...",
+        duration: 0
+      });
+      if (this.isOk) {
+        this.isOk = false;
+        let data = {
+          pageNo: this.pageNo,
+          pageSize: this.pageSize
+        };
 
-      if (obj.author) {
-        data.author = obj.author;
-      }
-      if (obj.publish) {
-        data.publish = obj.publish;
-      }
-      if (obj.title) {
-        data.title = obj.title;
-      }
-      if (this.typeVal) {
-        data.type = this.typeVal;
-      }
-      this.$axios
-        .get("/api/template/chart", { params: data })
-        .then(res => {
-          if (res.data.result) {
-            if (page === "page") {
-              this.content = [...this.content, ...res.data.list];
+        if (obj.author) {
+          data.author = obj.author;
+        }
+        if (obj.publish) {
+          data.publish = obj.publish;
+        }
+        if (obj.title) {
+          data.title = obj.title;
+        }
+        if (this.typeVal) {
+          data.type = this.typeVal;
+        }
+        this.$axios
+          .get("/api/template/chart", { params: data })
+          .then(res => {
+            if (res.data.result) {
+              if (page === "page") {
+                this.content = [...this.content, ...res.data.list];
+              } else {
+                this.content = res.data.list;
+              }
+              //传递到子组件
+              this.total = res.data.total;
+              let chart = this.$refs.chart;
+              chart.setData(
+                this.content,
+                this.typeArr,
+                this.content.length !== this.total,
+                this.pageNo
+              );
+              this.$Message.destroy();
             } else {
-              this.content = res.data.list;
-            }
-            //传递到子组件
-            this.total = res.data.total;
-            let chart = this.$refs.chart;
-            chart.setData(
-              this.content,
-              this.typeArr,
-              this.content.length !== this.total,
-              this.pageNo
-            );
-          } else {
-            this.$Message["error"]({
-              background: true,
-              content: "数据请求失败！"
-            });
-          }
-
-          // this.$router.push({ path: "/Artlist" });
-        })
-        .catch(function(error) {
-          console.log(error);
-        });
+              this.$Message["error"]({
+                background: true,
+                content: "数据请求失败！"
+              });
+            };
+            this.isOk = true;
+            // this.$router.push({ path: "/Artlist" });
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
+      }
     },
     setOneBugIsShow() {
       this.$store.commit("setOneBugIsShow", true);

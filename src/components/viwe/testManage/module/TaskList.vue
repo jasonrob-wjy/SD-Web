@@ -26,13 +26,13 @@
           </Dropdown>
         </div>
         <div>
-          <Button type="success" ghost @click="setIsShow">+ 新建任务</Button>
+          <Button type="success" ghost @click="onTableChange({})">+ 新建任务</Button>
         </div>
       </div>
     </div>
     <div class="warp">
       <!-- 表格 -->
-      <MyTable ref="table" />
+      <MyTable ref="table" @on-change="onTableChange" />
 
       <Page
         class="page-warp"
@@ -49,11 +49,29 @@
       />
 
       <!-- 新建Bug -->
-      <AddOneBug @on-change="getData" />
+      <AddOneBug @on-change="onChange" :value="assignArr" :content="content" v-if="bjrw" />
       <!-- 解决Bug -->
-      <Solve />
+      <Solve :value="assignArr" @on-change="onChange" :content="content" v-if="zpg" />
       <!-- 详情 -->
-      <Details />
+      <Details @on-change="onChange" :content="content" v-if="xq" />
+      <!-- 回测 -->
+      <Modal v-model="isShow" width="360" :closable="false" @on-cancel="handleShow(false)">
+        <div slot="header" style="color:#f60;text-align:center">
+          <Icon type="md-help-circle" size="20" />
+          <span>回测确认提示</span>
+        </div>
+        <div style="text-align:center">
+          <p>
+            若（此问题）已解决请点击确认按钮进行回测
+            <br />是否继续？
+          </p>
+        </div>
+        <div slot="footer">
+          <Button type="primary" ghost @click="getReset(content)">确认</Button>
+          <!-- <Button type="info" ghost @click.stop="handleAssignShow">指派</Button> -->
+          <Button type="success" ghost @click="handleShow(false)">关闭</Button>
+        </div>
+      </Modal>
     </div>
   </div>
   <!-- </div> -->
@@ -74,12 +92,19 @@ export default {
   },
   data() {
     return {
+      bjrw: false,
+      zpg: false,
+      xq: false,
+      isShow: false,
+      show: true,
+      content: null,
+
       project: "",
       state: "",
       title: "",
       author: "",
       url: "",
-      content: [],
+      assignArr: [],
       pageNo: 1,
       pageSize: 10,
       count: 0,
@@ -87,10 +112,6 @@ export default {
       limit: 10,
       type: "",
       cityList3: [
-        {
-          value: "默认全部",
-          label: "默认全部"
-        },
         {
           value: "项目1",
           label: "项目1"
@@ -102,10 +123,6 @@ export default {
       ],
 
       stateArr: [
-        {
-          value: "默认全部",
-          label: "默认全部"
-        },
         {
           value: "待处理",
           label: "待处理"
@@ -132,6 +149,29 @@ export default {
         }
       ]
     };
+  },
+  created() {
+    this.$axios
+      .get("/api/person/user")
+      .then(res => {
+        if (res.data.result) {
+          let data = res.data.data;
+          this.assignArr = data.map(item => {
+            return {
+              value: item.name,
+              label: item.name
+            };
+          });
+        } else {
+          this.$Message["error"]({
+            background: true,
+            content: "数据请求失败！"
+          });
+        }
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
   },
   mounted() {
     let author = this.$store.state.user.info;
@@ -181,9 +221,9 @@ export default {
       }
       this.$axios.get("/api/task", { params: data }).then(res => {
         if (res.data.result) {
-          this.content = res.data.list;
+          let content = res.data.list;
           this.count = res.data.total * 1;
-          this.$refs.table.setData(this.content);
+          this.$refs.table.setData(content);
           // this.$emit("on-detail", { data: this.bidData, mark: true });
         } else {
           this.$Message["error"]({
@@ -191,7 +231,6 @@ export default {
             content: "数据请求失败！"
           });
         }
-        this.$Message.destroy();
       });
     },
     changePage(event) {
@@ -202,9 +241,84 @@ export default {
       this.pageSize = event;
       this.getData();
     },
-    setIsShow() {
-      this.$store.commit("setOneBugIsShow", true);
+    handleShow(val) {
+      this.isShow = val;
+    },
+    onChange(val) {
+      switch (val) {
+        case "a":
+          break;
+        case "b":
+          this.bjrw = false;
+          break;
+        case "c":
+          this.zpg = false;
+          break;
+        case "d":
+          this.xq = false;
+          break;
+
+        default:
+          break;
+      }
+      this.getData();
+    },
+    onTableChange(val) {
+      this.$Message.destroy();
+      this.content = null;
+      switch (val.mark) {
+        case "a":
+          this.content = val.data;
+          this.handleShow(true);
+          break;
+        case "b":
+          this.content = val.data;
+          this.bjrw = true;
+          break;
+        case "c":
+          this.content = val.data;
+          this.zpg = true;
+          break;
+        case "d":
+          this.content = val.data;
+          this.xq = true;
+          break;
+        default:
+          this.bjrw = true;
+          break;
+      }
+    },
+    getReset(val) {
+      if (val.bid) {
+        let data = {
+          state: "待回测"
+        };
+        this.$axios
+          .put("/api/task", this.$qs.stringify({ bid: val.bid, data }))
+          .then(res => {
+            if (res.data.result) {
+              this.$Message["success"]({
+                background: true,
+                content: "状态更新成功！"
+              });
+              this.getData();
+              this.handleShow(false);
+            } else {
+              this.$Message["error"]({
+                background: true,
+                content: "状态更新失败！"
+              });
+            }
+            // this.$router.push({ path: "/Artlist" });
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
+      }
     }
+    // setIsShow() {
+    //   this.$store.commit("setOneBugIsShow", true);
+    // }
   }
 };
 </script>

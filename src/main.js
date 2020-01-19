@@ -42,16 +42,20 @@ router.beforeEach((to, from, next) => {
 //引入 store
 import store from './store/index';
 // 引入echarts
-import echarts from 'echarts';
-Vue.prototype.$echarts = echarts;
-
+// import echarts from 'echarts';
+// Vue.prototype.$echarts = echarts;
+// import './assets/echarts/echarts_min';
+// import './assets/echarts/echarts_wordcloud_min';
+// import './assets/echarts/map/js/china';
+// import './assets/echarts/map/js/world';
+// require('echarts-wordcloud');
+// import 'echarts-wordcloud'
 Vue.config.productionTip = false;
-
-import VueQuillEditor from 'vue-quill-editor'
+import VueQuillEditor from 'vue-quill-editor';
 // require styles
-import 'quill/dist/quill.core.css'
-import 'quill/dist/quill.snow.css'
-import 'quill/dist/quill.bubble.css'
+import 'quill/dist/quill.core.css';
+import 'quill/dist/quill.snow.css';
+import 'quill/dist/quill.bubble.css';
 
 // import * as Quill from 'quill'  //引入编辑器
 
@@ -63,18 +67,14 @@ import 'quill/dist/quill.bubble.css'
 
 Vue.use(VueQuillEditor)
 
-import hljs from 'highlight.js' //导入代码高亮文件
+import hljs from 'highlight.js'; //导入代码高亮文件
 // import 'highlight.js/styles/monokai-sublime.css'  //导入代码高亮样式
 // import 'highlight.js/styles/tomorrow-night.css'  //导入代码高亮样式
-import 'highlight.js/styles/tomorrow.css'  //导入代码高亮样式
+import 'highlight.js/styles/tomorrow.css';  //导入代码高亮样式
 //自定义一个代码高亮指令
 Vue.directive('highlight',function (el) {
   let highlight = el.querySelectorAll('pre');
   highlight.forEach((block)=>{
-      hljs.highlightBlock(block)
-  })
-  let highlight1 = el.querySelectorAll('.ql-editor');
-  highlight1.forEach((block)=>{
       hljs.highlightBlock(block)
   })
 });

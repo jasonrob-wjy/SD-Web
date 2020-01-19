@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Modal v-model="detailsIsShow" width="50%" @on-cancel="handleShow">
+    <Modal v-model="isShow" width="70%" @on-cancel="handleShow">
       <div slot="header">
         <h3>
           <Icon type="ios-create-outline" size="22" />详情内容
@@ -8,13 +8,19 @@
       </div>
       <div class="warp-box">
         <div>
-          <label>任务标题：</label>
-          <span>{{title}}</span>
-        </div>
-        <div>
+          <p>
+            <label>任务标题：</label>
+            <span>{{title}}</span>
+          </p>
           <p>
             <label>所属项目：</label>
             <span>{{project}}</span>
+          </p>
+        </div>
+        <div>
+          <p>
+            <label>状态：</label>
+            <span>{{state}}</span>
           </p>
           <p>
             <label>任务类型：</label>
@@ -38,8 +44,8 @@
             <span>{{assign}}</span>
           </p>
           <p>
-            <label>状态：</label>
-            <span>{{state}}</span>
+            <label>抄送给：</label>
+            <span v-for="(item,i) in send" :key="i+'q'">{{item}}{{send.length-1!==i?'、':''}}</span>
           </p>
         </div>
         <div>
@@ -67,6 +73,7 @@
 export default {
   data() {
     return {
+      isShow: true,
       title: "",
       project: "",
       assign: "",
@@ -76,29 +83,37 @@ export default {
       date: "",
       state: "待处理",
       type: "",
+      send: "",
       remarks: "",
       appendix: "",
       step: "",
-
       uploadList: []
     };
   },
-  // watch: {
-  //   oneBugIsShow(val) {
-  //     console.log(val);
-  //     this.isShow = val;
-  //   }
-  // },
-  computed: {
-    detailsIsShow() {
-      let data = this.$store.state.variable.rowData;
-      let state = this.$store.state.show.detailsIsShow;
-      if (state && data) {
-        this.getData(data);
-      }
-      return state;
+  props: ["value", "content"],
+  watch: {
+    isShow() {
+      this.handleShow();
     }
   },
+  mounted() {
+    this.getData(this.content);
+    // this.content = this.$store.state.variable.rowData;
+  },
+  // computed: {
+  //   detailsIsShow() {
+  //     let data = this.$store.state.variable.rowData;
+  //     let state = this.$store.state.show.detailsIsShow;
+  //     if (state && data) {
+  //       this.$nextTick(() => {
+  //         this.getData(data);
+  //       });
+  //     } else {
+  //       this.$store.commit("setRowData", {});
+  //     }
+  //     return state;
+  //   }
+  // },
   methods: {
     getData(data) {
       this.title = data.title;
@@ -110,36 +125,45 @@ export default {
       this.date = data.date;
       this.state = data.state;
       this.type = data.type;
+      this.send = JSON.parse(data.send);
       this.remarks = data.remarks;
       this.step = data.step;
       this.appendix = JSON.parse(data.appendix);
       // this.isShow = true;
     },
     handleShow() {
-      this.$store.commit("setDetailsIsShow", false);
+      this.$emit("on-change", "d");
     }
   }
 };
 </script>
 <style lang="scss" scoped>
 .warp-box {
-  > div {
-    padding: 10px 10px;
+  > div,
+  p {
+    // padding: 10px 10px;
     display: flex;
-    align-items: center;
+    margin: 10px 0;
+    // align-items: center;
     label {
+      align-items: flex-start;
       font-weight: 400;
+      width: 75px;
+      text-align: right;
+
+      margin-right: 10px;
     }
     > p {
       width: 50%;
+      margin: 0;
     }
 
     .editor {
       width: 86%;
     }
   }
-  .fj{
-    li{
+  .fj {
+    li {
       margin-right: 15px;
       padding: 3px 6px;
       color: cadetblue;
