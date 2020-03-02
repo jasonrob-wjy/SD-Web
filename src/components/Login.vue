@@ -203,13 +203,13 @@ export default {
         });
         return;
       }
-      if (this.isChinese(this.userName)) {
-        this.$Message["error"]({
-          background: true,
-          content: "请输入真实姓名！"
-        });
-        return;
-      }
+      // if (this.isChinese(this.userName)) {
+      //   this.$Message["error"]({
+      //     background: true,
+      //     content: "请输入真实姓名！"
+      //   });
+      //   return;
+      // }
 
       if (!this.userPass) {
         this.$Message["error"]({
@@ -255,13 +255,13 @@ export default {
         });
         return;
       }
-      if (this.isChinese(this.userName)) {
-        this.$Message["error"]({
-          background: true,
-          content: "请输入真实姓名！"
-        });
-        return;
-      }
+      // if (this.isChinese(this.userName)) {
+      //   this.$Message["error"]({
+      //     background: true,
+      //     content: "请输入真实姓名！"
+      //   });
+      //   return;
+      // }
       if (!this.userPass) {
         this.$Message["error"]({
           background: true,
@@ -344,6 +344,7 @@ export default {
   justify-content: center;
   align-items: center;
   background: url("../assets/bg1.jpg") 100% 100% no-repeat;
+  background-size: cover;
   .warp {
     width: 450px;
     background: #fff;

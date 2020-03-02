@@ -20,27 +20,36 @@ Vue.prototype.$qs = qs;
 //引入路由
 import router from './router/index';
 const whiteList = ['/task'];//不需要登录能访问的path
-router.beforeEach((to, from, next) => {
-  console.log('beforeEach');
-  // let userInfo = JSON.parse(sessionStorage.getItem('state'));//获取缓存看是否登录过
-  let state = sessionStorage.getItem('state');//获取缓存看是否登录过
-  if (whiteList.indexOf(to.path) < 0) {//访问了需要登录才能访问的页面
-    if (state === 'true') {//登录过来直接进去
-      next();
-    } else {
-      if (to.path == '/login') {
-        next();
-      } else {
-        next('/login');
-      }
-    }
-  } else {
-    next();
-  }
-});
+// router.beforeEach((to, from, next) => {
+//   console.log('beforeEach');
+//   // let userInfo = JSON.parse(sessionStorage.getItem('state'));//获取缓存看是否登录过
+//   let state = sessionStorage.getItem('state');//获取缓存看是否登录过
+//   if (whiteList.indexOf(to.path) < 0) {//访问了需要登录才能访问的页面
+//     if (state === 'true') {//登录过来直接进去
+//       next();
+//     } else {
+//       if (to.path == '/login') {
+//         next();
+//       } else {
+//         next('/login');
+//       }
+//     }
+//   } else {
+//     next();
+//   }
+// });
+
+import uploader from 'vue-simple-uploader'
+Vue.use(uploader)
 
 //引入 store
 import store from './store/index';
+
+import event from './utils/event'
+Vue.prototype.$event = event
+
+import VueClipboard from 'vue-clipboard2'
+Vue.use(VueClipboard)
 // 引入echarts
 // import echarts from 'echarts';
 // Vue.prototype.$echarts = echarts;

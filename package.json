@@ -17,8 +17,10 @@
     "sass-loader": "^7.1.0",
     "view-design": "^4.0.2",
     "vue": "^2.6.10",
+    "vue-clipboard2": "^0.3.1",
     "vue-quill-editor": "^3.0.6",
     "vue-router": "^3.1.0",
+    "vue-simple-uploader": "^0.7.4",
     "vuex": "^3.1.1"
   },
   "devDependencies": {

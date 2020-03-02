@@ -39,8 +39,14 @@ export default new Router({
           path: '/components',
           name: 'componentmain',
           component: () => import('../components/viwe/componentsManage/componentMain.vue')
-
         },
+        //前端部署
+        {
+          path: '/deploy',
+          name: 'deploy',
+          component: () => import('../components/viwe/deploy/Main')
+        },
+
         //任务管理
         {
           path: '/task',

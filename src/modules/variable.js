@@ -1,9 +1,13 @@
 const state = {
   positionIsShow: false,
   user: { name: 'zll', url: '' },
-  rowData: null
+  rowData: null,
+  sideList: null
 }
 const mutations = {
+  setSideList(state, data) {
+    state.sideList = data;
+  },
   setRowData(state, data) {
     state.rowData = data;
   },
