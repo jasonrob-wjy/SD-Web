@@ -1,18 +1,15 @@
 <template>
   <div id="app">
     <transition name="show">
-      <Main />
+       <router-view />
     </transition>
   </div>
 </template>
 
 <script>
-import Main from "./components/Main.vue";
 export default {
   name: "app",
-  components: {
-    Main
-  },
+
   mounted() {
     //*****************************解决刷新页面数据丢失开始**************************************** */
     if (sessionStorage.getItem("store")) {

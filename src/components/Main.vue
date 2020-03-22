@@ -6,31 +6,31 @@
           <div class="menu">
             <div class="logo">Simple Design</div>
             <Menu mode="horizontal" :theme="theme" active-name="1">
-              <MenuItem name="1" to="/">
+              <!-- <MenuItem name="1" to="/">
                 <Icon type="md-apps" size="16" />工作台
+              </MenuItem> -->
+              <MenuItem name="2" to="/charts">
+                <Icon type="ios-bookmarks-outline" size="16" />可视化图谱
               </MenuItem>
-              <MenuItem name="2" to="/project">
-                <Icon type="ios-bookmarks-outline" size="16" />项目管理
+              <!-- <MenuItem name="3" to="/components">
+                <Icon type="ios-people-outline" size="16" />前端组件
+              </MenuItem> -->
+              <!-- <MenuItem name="4" to="/task">
+                <Icon type="ios-folder-outline" size="16" />任务管理
               </MenuItem>
-              <MenuItem name="3" to="/task">
-                <Icon type="ios-paper-outline" size="16" />任务管理
+             <MenuItem name="5" to="/sys">
+                <Icon type="ios-briefcase-outline" />系统管理
+              </MenuItem> -->
+                <MenuItem name="4" to="/deploy">
+                <Icon type="ios-paper-outline" size="16" />前端部署
               </MenuItem>
-              <MenuItem name="4" to="/team">
-                <Icon type="ios-people-outline" size="16" />团队成员
-              </MenuItem>
-              <MenuItem name="5" to="/file">
-                <Icon type="ios-folder-outline" size="16" />文档管理
-              </MenuItem>
-              <MenuItem name="7" to="/template">
-                <Icon type="ios-briefcase-outline" />工具模板
-              </MenuItem>
-              <MenuItem name="6" to="/sif">
-                <Icon type="ios-construct-outline" size="16" />系统设置
-              </MenuItem>
+                <!-- <MenuItem name="3" to="/">
+                <Icon type="ios-paper-outline" size="16" />可视化大屏
+              </MenuItem> -->
             </Menu>
           </div>
           <div class="nav">
-            <div class="badge">
+            <!-- <div class="badge">
               <Dropdown placement="bottom-start">
                 <Badge dot>
                   <Icon type="ios-notifications-outline" size="26"></Icon>
@@ -43,7 +43,7 @@
                   </Tabs>
                 </DropdownMenu>
               </Dropdown>
-            </div>
+            </div> -->
             <!-- <svg width="64" height="41" viewBox="0 0 64 41"><g transform="translate(0 1)" fill="none" fill-rule="evenodd"><ellipse fill="#F5F5F5" cx="32" cy="33" rx="32" ry="7"></ellipse><g fill-rule="nonzero" stroke="#D9D9D9"><path d="M55 12.76L44.854 1.258C44.367.474 43.656 0 42.907 0H21.093c-.749 0-1.46.474-1.947 1.257L9 12.761V22h46v-9.24z"></path><path d="M41.613 15.931c0-1.605.994-2.93 2.227-2.931H55v18.137C55 33.26 53.68 35 52.05 35h-40.1C10.32 35 9 33.259 9 31.137V13h11.16c1.233 0 2.227 1.323 2.227 2.928v.022c0 1.605 1.005 2.901 2.237 2.901h14.752c1.232 0 2.237-1.308 2.237-2.913v-.007z" fill="#FAFAFA"></path></g></g></svg> -->
             <!-- <Dropdown>
               <div class="config">
@@ -72,7 +72,7 @@
               </DropdownMenu>
             </Dropdown>-->
 
-            <Dropdown>
+            <!-- <Dropdown>
               <div class="add config">
                 <Icon type="md-add" size="25" />新建
               </div>
@@ -84,16 +84,14 @@
                   <Icon type="ios-swap" size="16" />写周报
                 </DropdownItem>
               </DropdownMenu>
-            </Dropdown>
+            </Dropdown> -->
             <Dropdown>
               <div class="config">
-                <img
-                  src="https://beta.vilson.xyz/static/upload/member/avatar/20191021/75133823503a44b34269b7d4161b9078.jpg"
-                />
-                <span>郑玲璐</span>
+                <img :src="$url+'/'+imgurl" />
+                <span>{{name}}</span>
               </div>
               <DropdownMenu slot="list">
-                <DropdownItem>
+                <!-- <DropdownItem>
                   <Icon type="ios-contact-outline" size="16" />个人中心
                 </DropdownItem>
                 <DropdownItem>
@@ -104,17 +102,20 @@
                 </DropdownItem>
                 <DropdownItem>
                   <Icon type="ios-information-circle-outline" size="16" />提 Issue
-                </DropdownItem>
+                </DropdownItem> -->
                 <DropdownItem>
-                  <Icon type="ios-log-out" size="16" />退出登录
+                  <span @click="handleLogout">
+                    <Icon type="ios-log-out" size="16" />退出登录
+                  </span>
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>
         </div>
       </Header>
-
+      <!-- <transition name="show"> -->
       <router-view />
+      <!-- </transition> -->
       <!-- <Footer class="layout-footer-center">2011-2016 &copy; TalkingData</Footer> -->
     </Layout>
   </div>
@@ -123,35 +124,34 @@
 export default {
   data() {
     return {
-      theme: "light"
+      theme: "light",
+      name: "",
+      imgurl: ""
     };
   },
 
   computed: {
-    
+    info() {
+      return this.$store.state.user.info;
+    }
+  },
+  watch: {
+    info(val) {
+      let author = val;
+      this.name = author.name;
+      this.imgurl = author.url;
+    }
   },
   mounted() {
-    //  this.axios
-    //     .post('/api/template/chart', qs.stringify(data))
-    //     .then(response => {
-    //       if (response.data.result) {
-    //         this.$Message["success"]({
-    //           background: true,
-    //           content: "数据提交成功！"
-    //         });
-    //         this.onEditorClear();
-    //       } else {
-    //         this.$Message["error"]({
-    //           background: true,
-    //           content: "数据上传失败！"
-    //         });
-    //       }
-
-    //       // this.$router.push({ path: "/Artlist" });
-    //     })
-    //     .catch(function(error) {
-    //       console.log(error);
-    //     });
+    let author = this.$store.state.user.info;
+    this.name = author.name;
+    this.imgurl = author.url;
+  },
+  methods: {
+    handleLogout() {
+      window.sessionStorage.setItem("state", false);
+      this.$router.push({ path: "/login" });
+    }
   }
 };
 </script>

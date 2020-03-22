@@ -4,20 +4,22 @@
     <div>由于图表数据量可能较大，在这里只提供部分数据结构用于模拟演示，便于后端接口开发；</div>
     <h3>图谱源码：</h3>
     <div class="content">
-<pre>
-  <code>
-    this.myEcharts = this.$echarts.init(this.ele, 'halloween');
-  </code>
-</pre>
+      <AceEditor :content="api" lang="javascript" />
     </div>
   </div>
 </template>
 
 <script>
+import AceEditor from "./AceEditor";
 export default {
-  name: "jsedition",
+  name: "apiedition",
+  components: {
+    AceEditor
+  },
   data: () => ({
     html: '<div class="myChart" ref="myChart"></div>',
+    api: "",
+    newData: {},
     color: [
       "#c23531",
       "#2f4554",
@@ -32,8 +34,21 @@ export default {
       "#c4ccd3"
     ]
   }),
-  props: {
-    msg: String
+  props: ["content"],
+  watch: {
+    content(val) {
+      this.newData = val;
+      this.getTemplate();
+    }
+  },
+  mounted() {
+    this.newData = this.content;
+    this.getTemplate();
+  },
+  methods: {
+    getTemplate() {
+      this.api = this.newData.data;
+    }
   }
 };
 </script>
@@ -64,13 +79,9 @@ export default {
   }
 }
 .content {
-  pre {
-    padding: 0;
-    margin: 0;
-    color: #333;
-    background: #f8f8f8;
-  }
-}
-.dow-warp {
+  padding: 5px;
+  height: 300px;
+  border-radius: 8px;
+  border: 1px dashed rgba(67, 140, 204, 0.3);
 }
 </style>

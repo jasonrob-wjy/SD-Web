@@ -3,56 +3,88 @@
     <Modal v-model="oneBugIsShow" width="70%" @on-cancel="handleShow">
       <div slot="header">
         <h3>
-          <Icon type="ios-create-outline" size="22" />新建图谱
+          <Icon type="ios-create-outline" size="22" />新建 / 编辑
         </h3>
       </div>
+      <div class="qhan">
+        <span @click="handleCharge('0')" :class="[chartClass==='0'?'active':'']">Echarts图谱</span>
+        <span @click="handleCharge('1')" :class="[chartClass==='1'?'active':'']">非Echarts图谱</span>
+      </div>
       <div class="warp">
-        <!-- <p>
-          <label>图谱标题：</label>
-          <Input v-model="value" placeholder="Enter something..." style="width: 300px" />
-        </p>-->
         <div>
           <label>封面上传：</label>
-          <Upload multiple action="//jsonplaceholder.typicode.com/posts/">
-            <Button icon="ios-cloud-upload-outline">封面上传</Button>
+          <Upload
+            multiple
+            type="drag"
+            :action="$url+'/api/template/chart/img'"
+            :on-success="handleSuccess"
+            :show-upload-list="false"
+          >
+            <div class="upload" v-if="!imgSrc">
+              <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+              <p>点击或拖拽上传</p>
+            </div>
+            <div v-else>
+              <img :src="$url+'/'+imgSrc" />
+            </div>
           </Upload>
-          <span>上传文件、文本、图片等</span>
         </div>
         <p>
           <label>图谱标题：</label>
-          <Input v-model="value" placeholder="Enter something..." style="width: 300px" />
-          <label>图谱类型：</label>
-          <Select v-model="model1" style="width:300px">
-            <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-          </Select>
+          <Input v-model="title" placeholder="请输入标题..." style="width: 300px" />
         </p>
-        <!-- <p>
-          <label>当前指派：</label>
-          <Select v-model="model1" style="width:300px">
-            <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+        <div v-if="isAddClear">
+          <label>图谱类型：</label>
+          <Select v-model="type" style="width:300px">
+            <Option v-for="(item,i) in typeArr" :value="item" :key="i+'w'">{{ item }}</Option>
           </Select>
-          <label>优先级别：</label>
-          <Select v-model="model1" style="width:300px">
-            <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-          </Select>
-        </p>-->
-
-        <div>
-          <label>Option：</label>
-          <Input v-model="value6" type="textarea" :rows="8" placeholder="请输入 Option 配置代码..." />
+          <Icon type="ios-add-circle-outline" class="add-clear" size="26" @click="handleAddClear" />
+        </div>
+        <div v-else>
+          <label>图谱类型：</label>
+          <Input v-model="type" placeholder="请输入图谱类型..." style="width: 300px" />
+          <Icon
+            type="ios-close-circle-outline"
+            class="add-clear"
+            size="26"
+            @click="handleAddClear"
+          />
         </div>
         <div>
-          <label>API数据：</label>
-          <Input v-model="value6" type="textarea" :rows="8" placeholder="请输入 API 数据..." />
+          <label v-if="chartClass==='0'">Option：</label>
+          <label v-else>JS 代码：</label>
+          <Input
+            v-model="option"
+            type="textarea"
+            :rows="8"
+            :placeholder="chartClass==='0'?'请输 option 内容... let option = { ... }':'请输入 JS 代码...'"
+          />
         </div>
         <div>
-          <label>备注：</label>
-          <QuillEditor class="editor" />
+          <label>API 数据：</label>
+          <Input
+            v-model="data"
+            type="textarea"
+            :rows="8"
+            placeholder="请输入 API 数据... 例如：let data = { ... }"
+          />
+        </div>
+        <!-- <div>
+          <label>theme 数据：</label>
+          <Input v-model="theme" type="textarea" :rows="8" placeholder="请输入主题配置... 例如：let themeObj = { ... } （ 此部分可以不用填写 ）" />
+        </div>-->
+        <div>
+          <label v-if="chartClass==='0'">备注：</label>
+          <label v-else>使用说明：</label>
+          <QuillEditor class="editor" :content="explain" @on-change="onEditorChange" />
         </div>
       </div>
       <div slot="footer">
-        <Button type="info">确定</Button>
-        <Button type="primary" @click.stop="handleShow">关闭</Button>
+        <div class="button-footer">
+          <Button type="success" @click="handleSubmit('yes')">提交发布</Button>
+          <Button type="info" @click="handleSubmit('no')">保存草稿</Button>
+          <Button type="primary" @click.stop="handleShow">关闭</Button>
+        </div>
       </div>
     </Modal>
   </div>
@@ -70,6 +102,7 @@ export default {
       return this.$store.state.show.oneBugIsShow;
     }
   },
+  props: ["typeArr"],
   // watch: {
   //   oneBugIsShow(val) {
   //     console.log(val);
@@ -78,8 +111,10 @@ export default {
   // },
   data() {
     return {
+      quillContent: "",
       isShow: true,
-      value: "asd",
+      value: "",
+      isAddClear: true,
       cityList: [
         {
           value: "饼状图谱",
@@ -88,45 +123,211 @@ export default {
         {
           value: "柱状图谱",
           label: "柱状图谱"
-        },
-        {
-          value: "折线图谱",
-          label: "折线图谱"
-        },
-        {
-          value: "Ottawa",
-          label: "Ottawa"
-        },
-        {
-          value: "Paris",
-          label: "Paris"
-        },
-        {
-          value: "Canberra",
-          label: "Canberra"
         }
       ],
-      model1: ""
+      model1: "",
+      bid: "",
+      title: "",
+      type: "",
+      look: 1,
+      author: "",
+      option: "",
+      theme: "",
+      data: "",
+      imgSrc: "",
+      url: "",
+      explain: "",
+      bid: "",
+      date: "",
+      chartClass: "0"
     };
   },
+  mounted() {
+    let author = this.$store.state.user.info;
+    this.author = author.name;
+    this.url = author.url;
+    // this.url = this.$store.state.variable.user.url;
+  },
   methods: {
-    handleShow() {
-      this.$store.commit("setOneBugIsShow", false);
+    handleClear() {
+      this.bid = "";
+      this.title = "";
+      this.type = "";
+      this.option = "";
+      this.data = "";
+      this.url = "";
+      this.imgSrc = "";
+      this.theme = "";
+      this.explain = "";
+      this.bid = "";
+      this.date = "";
+      this.chartClass = "0";
     },
-    show(index) {
-      this.$Modal.info({
-        title: "User Info",
-        content: `Name：${this.data6[index].name}<br>Age：${this.data6[index].age}<br>Address：${this.data6[index].address}`
+    getBidData(bid) {
+      this.bid = bid;
+      this.$axios.get("/api/template/chart", { params: { bid } }).then(res => {
+        if (res.data.result) {
+          // console.log(res.data.content);
+          let content = res.data.content;
+          this.title = content.title;
+          this.type = content.type;
+          this.option = content.option;
+          this.data = content.data;
+          this.imgSrc = content.imgSrc;
+          this.theme = content.theme;
+          this.chartClass = content.chartClass;
+          this.explain = content.explain;
+        } else {
+          this.$Message["error"]({
+            background: true,
+            content: "数据请求失败！"
+          });
+        }
       });
     },
-    remove(index) {
-      this.data6.splice(index, 1);
+    handleSubmit(val) {
+      this.$Message.destroy();
+      // 判断输入内容是否为空
+      if (!this.title) {
+        this.$Message["error"]({
+          background: true,
+          content: "图谱标题不得为空！"
+        });
+        return;
+      }
+      if (!this.type) {
+        this.$Message["error"]({
+          background: true,
+          content: "图谱类型不得为空！"
+        });
+        return;
+      }
+
+      let data = {
+        title: this.title,
+        type: this.type,
+        author: this.author,
+        option: this.option,
+        data: this.data,
+        // theme: this.theme,
+        imgSrc: this.imgSrc ? this.imgSrc : "/assets/img/df.png",
+        url: this.url ? this.url : "/assets/img/dt.png",
+        chartClass: this.chartClass,
+        publish: val,
+        explain: this.explain
+      };
+      //判断更新数据还是添加数据
+      if (this.bid) {
+        this.$axios
+          .put(
+            "/api/template/chart",
+            this.$qs.stringify({ bid: this.bid, data })
+          )
+          .then(res => {
+            if (res.data.result) {
+              this.$Message["success"]({
+                background: true,
+                content: "数据提交成功！"
+              });
+              this.handleShow();
+            } else {
+              this.$Message["error"]({
+                background: true,
+                content: "数据上传失败！"
+              });
+            }
+            // this.$router.push({ path: "/Artlist" });
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
+      } else {
+        this.$axios
+          .post("/api/template/chart", this.$qs.stringify(data))
+          .then(res => {
+            if (res.data.result) {
+              this.$Message["success"]({
+                background: true,
+                content: "数据提交成功！"
+              });
+              this.handleShow();
+            } else {
+              this.$Message["error"]({
+                background: true,
+                content: "数据上传失败！"
+              });
+            }
+            // this.$router.push({ path: "/Artlist" });
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
+      }
+    },
+    handleAddClear() {
+      this.isAddClear = !this.isAddClear;
+    },
+    handleCharge(val) {
+      this.chartClass = val;
+    },
+    handleShow() {
+      this.handleClear();
+      this.$store.commit("setOneBugIsShow", false);
+      this.$emit("on-change");
+    },
+    onEditorChange(quill) {
+      // console.log(quill);
+      this.explain = quill.html;
+    },
+    handleSuccess(res, file) {
+      if (res.result) {
+        this.imgSrc = res.fileInfo.path;
+        this.$Message["success"]({
+          background: true,
+          content: "图片上传成功！"
+        });
+      } else {
+        this.$Message["error"]({
+          background: true,
+          content: "图片上传失败！"
+        });
+      }
     }
   }
 };
 </script>
 <style lang="scss" scoped>
+.qhan {
+  position: absolute;
+  top: 3px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  span {
+    padding: 10px;
+    margin: 6px 12px;
+    border: 1px solid #fff;
+    border-radius: 6px 6px 0 0;
+    cursor: pointer;
+  }
+  span:hover,
+  span.active {
+    border: 1px solid #e8eaec;
+    background-color: #fff;
+    border-bottom: 0px;
+    color: #19be6b;
+  }
+}
 .warp {
+  img {
+    display: block;
+    width: 218px;
+    height: 155px;
+  }
+  .upload {
+    padding: 30px 50px;
+  }
   p,
   > div {
     padding: 10px 10px;
@@ -144,7 +345,20 @@ export default {
       width: 86%;
     }
   }
+  .add-clear {
+    cursor: pointer;
+  }
+  .add-clear:hover {
+    color: #19be6b;
+  }
+}
+.button-footer {
+  margin-bottom: 20px;
 }
 </style>
 
-
+<style lang="scss">
+.ivu-input-wrapper {
+  width: calc(97% - 100px);
+}
+</style>

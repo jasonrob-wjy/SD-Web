@@ -1,9 +1,25 @@
 const state = {
-  positionIsShow:false,
+  positionIsShow: false,
+  user: { name: 'zll', url: '' },
+  rowData: null,
+  sideList: null,
+  projectName: null,
 }
 const mutations = {
+  setSideList(state, data) {
+    state.sideList = data;
+  },
+  setProjectName(state, data) {
+    state.projectName = data;
+  },
+  setRowData(state, data) {
+    state.rowData = data;
+  },
   setPositionIsShow(state, data) {
     state.positionIsShow = data;
+  },
+  setUser(state, data) {
+    state.user = data;
   }
 }
 const actions = {

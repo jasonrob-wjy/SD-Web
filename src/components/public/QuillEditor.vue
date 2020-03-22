@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <!-- bidirectional data binding（双向数据绑定） -->
+  <div class="quill-editor" :class="[isFullscreen?'fullscreen':'']">
     <quill-editor
       v-model="content"
       ref="myQuillEditor"
@@ -10,9 +9,9 @@
       @ready="onEditorReady($event)"
       @change="onEditorChange($event)"
     ></quill-editor>
-
-    <!-- Or manually control the data synchronization（或手动控制数据流） -->
-    <!-- <quill-editor :content="content" :options="editorOption" @change="onEditorChange($event)"></quill-editor> -->
+    <span class="fullscreen-open" @click="handlefullscreen">
+      <Icon type="ios-expand" />
+    </span>
   </div>
 </template>
 
@@ -27,8 +26,10 @@ import * as Quill from "quill";
 export default {
   data() {
     return {
-      content: `<p>[步骤]</p><p><br></p><p><br></p><p>[结果]</p><p><br></p><p><br></p><p>[期望]</p><p><br></p><p><br></p><p><br></p><p><br></p>`,
+      // content: `<p>[步骤]</p><p><br></p><p><br></p><p>[结果]</p><p><br></p><p><br></p><p>[期望]</p><p><br></p><p><br></p><p><br></p><p><br></p>`,
+      isFullscreen: false,
       editorOption: {
+        height: "200px",
         modules: {
           toolbar: [
             ["bold", "italic", "underline", "strike"], //加粗，斜体，下划线，删除线
@@ -52,21 +53,78 @@ export default {
       }
     };
   },
+  props: ["content"],
   // manually control the data synchronization
   // 如果需要手动控制数据同步，父组件需要显式地处理changed事件
   methods: {
     onEditorBlur(quill) {
-      console.log("editor blur!", quill);
+      // console.log("editor blur!", quill);
     },
     onEditorFocus(quill) {
-      console.log("editor focus!", quill);
+      // console.log("editor focus!", quill);
     },
     onEditorReady(quill) {
-      console.log("editor ready!", quill);
+      // console.log("editor ready!", quill);
     },
-    onEditorChange({ quill, html, text }) {
-      console.log("editor change!", quill, html, text);
-      this.content = html;
+    onEditorChange(quill) {
+      let ql_editor = this.$refs.myQuillEditor.$el.querySelector(".ql-editor");
+      //获取所有的img标签
+      let elements = ql_editor.getElementsByTagName("img");
+      for (let j = 0; j < elements.length; j++) {
+        //循环给所有的img的标签，动态绑定onclick方法
+        elements[j].onclick = function() {
+          console.log(this);
+
+          // // 1. 获取两个大小div
+          // var oPanel = document.getElementById("panel");
+          // var oDragIcon = document.getElementById("dragIcon");
+          // // 定义4个变量
+          // var disX = 0; //鼠标按下时光标的X值
+          // var disY = 0; //鼠标按下时光标的Y值
+          // var disW = 0; //拖拽前div的宽
+          // var disH = 0; // 拖拽前div的高
+          // //3. 给小div加点击事件
+          // oDragIcon.onmousedown = function(ev) {
+          //   var ev = ev || window.event;
+          //   disX = ev.clientX; // 获取鼠标按下时光标x的值
+          //   disY = ev.clientY; // 获取鼠标按下时光标Y的值
+          //   disW = oPanel.offsetWidth; // 获取拖拽前div的宽
+          //   disH = oPanel.offsetHeight; // 获取拖拽前div的高
+          //   document.onmousemove = function(ev) {
+          //     var ev = ev || window.event;
+          //     //拖拽时为了对宽和高 限制一下范围，定义两个变量
+          //     var W = ev.clientX - disX + disW;
+          //     var H = ev.clientY - disY + disH;
+          //     if (W < 100) {
+          //       W = 100;
+          //     }
+          //     if (W > 800) {
+          //       W = 800;
+          //     }
+          //     if (H < 100) {
+          //       H = 100;
+          //     }
+          //     if (H > 500) {
+          //       H = 500;
+          //     }
+          //     oPanel.style.width = W + "px"; // 拖拽后物体的宽
+          //     oPanel.style.height = H + "px"; // 拖拽后物体的高
+          //   };
+          //   document.onmouseup = function() {
+          //     document.onmousemove = null;
+          //     document.onmouseup = null;
+          //   };
+          // };
+
+
+
+
+        };
+      }
+      this.$emit("on-change", quill);
+    },
+    handlefullscreen() {
+      this.isFullscreen = !this.isFullscreen;
     }
   },
   computed: {
@@ -75,11 +133,11 @@ export default {
     }
   },
   mounted() {
-    console.log("this is current quill instance object", this.editor);
+    // console.log("this is current quill instance object", this.editor);
   }
 };
 </script>
-<style>
+<style lang="scss">
 .ql-snow .ql-tooltip[data-mode="link"]::before {
   content: "请输入链接地址:";
 }
@@ -180,12 +238,45 @@ export default {
 .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="36px"]::before {
   content: "36px";
 }
-.ql-toolbar.ql-snow{
-    border: 1px solid #dcdee2;
-    border-radius: 4px 4px 0 0;
+.ql-toolbar.ql-snow {
+  border: 1px solid #dcdee2;
+  border-radius: 4px 4px 0 0;
 }
-.ql-container.ql-snow{
-     border: 1px solid #dcdee2;
-      border-radius: 0 0 4px 4px;
+.ql-container.ql-snow {
+  border: 1px solid #dcdee2;
+  border-radius: 0 0 4px 4px;
+  min-height: 200px;
+}
+
+.quill-editor {
+  position: relative;
+}
+.fullscreen-open {
+  top: 75px;
+  right: 30px;
+  font-size: 20px;
+  position: absolute;
+  cursor: pointer;
+}
+.fullscreen {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  background: #fff;
+  z-index: 100000;
+  width: 99.3% !important;
+  margin-right: 0 !important;
+  .fullscreen-open {
+    top: 55px;
+  }
+  .ql-container {
+    height: calc(100vh - 42px);
+    overflow-y: auto !important;
+  }
+}
+.ql-snow .ql-editor pre.ql-syntax {
+  color: #666;
 }
 </style>

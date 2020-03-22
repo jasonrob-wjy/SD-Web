@@ -1,55 +1,56 @@
 <template>
   <div style="overflow-x:hidden;">
-  <section>
-    <div class="page-header">
-      <p class="muted">『 我们往往把自己的性格和人品说得言过其实了。如果真理被冷酷无情地揭示出来时，我们反倒不能明辨是非了。』 —— 《三幕悲剧》</p>
-      <div class="header-content">
-        <div class="left-content">
-          <img
+    <section>
+      <div class="page-header">
+        <p class="muted">『 我们往往把自己的性格和人品说得言过其实了。如果真理被冷酷无情地揭示出来时，我们反倒不能明辨是非了。』 —— 《三幕悲剧》</p>
+        <div class="header-content">
+          <div class="left-content">
+            <!-- <img
             src="https://beta.vilson.xyz/static/upload/member/avatar/20191021/75133823503a44b34269b7d4161b9078.jpg"
             alt
-          />
-          <div class="user-info">
-            <p class="title">午饭时间到了，vilson，祝你开心每一天！</p>
-            <!-- <p class="title">早安，vilson，祝你开心每一天！</p> -->
-            <!-- <p class="muted">业务总监 | 业务中心 -</p> -->
-            <p class="dashboard-workplace-header-tip-desc muted">
-              <i class="ivu-icon ivu-icon-md-rainy"></i> 今日阴转小雨，22℃ - 32℃，出门记得带伞哦。
-            </p>
+            />-->
+            <img :src="$url+'/'+imgurl" />
+            <div class="user-info">
+              <p class="title">午饭时间到了，vilson，祝你开心每一天！</p>
+              <!-- <p class="title">早安，vilson，祝你开心每一天！</p> -->
+              <!-- <p class="muted">业务总监 | 业务中心 -</p> -->
+              <p class="dashboard-workplace-header-tip-desc muted">
+                <i class="ivu-icon ivu-icon-md-rainy"></i> 今日阴转小雨，22℃ - 32℃，出门记得带伞哦。
+              </p>
+            </div>
           </div>
+          <ol class="right-content muted">
+            <li>
+              <p>任务数</p>
+              <p class="item-text">201</p>
+            </li>
+            <li>
+              <p>团队内排名</p>
+              <p>
+                <span class="item-text">2</span>/ 8
+              </p>
+            </li>
+            <li>
+              <p>项目数</p>
+              <p class="item-text">201</p>
+            </li>
+          </ol>
         </div>
-        <ol class="right-content muted">
-          <li>
-            <p>任务数</p>
-            <p class="item-text">201</p>
-          </li>
-          <li>
-            <p>团队内排名</p>
-            <p>
-              <span class="item-text">2</span>/ 8
-            </p>
-          </li>
-          <li>
-            <p>项目数</p>
-            <p class="item-text">201</p>
-          </li>
-        </ol>
       </div>
-    </div>
-    <div class="list">
-      <div class="left">
-        <!-- 项目列表 -->
-        <ProjectList />
-         <!-- 动态 -->
-        <Trends />
+      <div class="list">
+        <div class="left">
+          <!-- 项目列表 -->
+          <ProjectList />
+          <!-- 动态 -->
+          <Trends />
+        </div>
+        <div class="right">
+          <Operation />
+          <Member />
+        </div>
       </div>
-      <div class="right">
-        <Operation/>
-        <Member/>
-      </div>
-    </div>
-  </section>
-   </div>
+    </section>
+  </div>
 </template>
 
 <script>
@@ -65,8 +66,26 @@ export default {
     Operation,
     Member
   },
+  data:()=>({
+    imgurl:"",
+  }),
   props: {
     msg: String
+  },
+  computed: {
+    info() {
+      return this.$store.state.user.info;
+    }
+  },
+  watch: {
+    info(val) {
+      let author = val;
+      this.imgurl = author.url;
+    }
+  },
+  mounted() {
+    let author = this.$store.state.user.info;
+    this.imgurl = author.url;
   }
 };
 </script>
