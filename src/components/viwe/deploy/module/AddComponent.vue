@@ -17,37 +17,53 @@
 					<Select style="width:300px" :value="projectName" @on-change="projectNameChange">
 						<Option v-for="(item,i) in sideList" :value="item" :key="i+'w'">{{ item }}</Option>
 					</Select>
-					<Icon type="ios-add-circle-outline" class="add-clear" size="26" @click="handleAddClear" />
+					<Icon type="ios-add-circle-outline" class="add-clear" size="22" @click="handleAddClear" />
 				</div>
 				<div v-else>
 					<label>所属项目：</label>
 					<Input v-model="projectName" placeholder="请输入新项目名称..." style="width: 300px" />
-					<Icon type="ios-close-circle-outline" class="add-clear" size="26" @click="handleAddClear" />
+					<Icon type="ios-close-circle-outline" class="add-clear" size="22" @click="handleAddClear" />
 				</div>
 				<div v-if="!isAddClear">
 					<label>部署目录：</label>
 					<Input v-model="root" placeholder="例如：dist" style="width: 300px" />
+					<Tooltip max-width="200" content="指部署到服务器上的目录，也就是一级目录。" placement="right">
+						<Icon type="ios-help-circle-outline tip" size="22" :class="[isEx?'isEx':'']" />
+					</Tooltip>
+					<span v-if="isEx" class="isEx">此目录已存在，请重新输入！</span>
 				</div>
 				<div v-if="modeType==='1'">
 					<label>Git 地址：</label>
 					<Input
 						v-model="gitUrl"
-						placeholder="例如：https://github.com/zlluGitHub/vue-cil3.0-template.git"
+						placeholder="例如：http://10.0.86.12/zll/science.git"
 						style="width: 300px"
 					/>
+					<Tooltip max-width="200" content="此处填写 gitLab 仓库地址。" placement="right">
+						<Icon type="ios-help-circle-outline tip" size="22" />
+					</Tooltip>
 				</div>
 
 				<div v-if="modeType==='1'">
 					<label>项目分支：</label>
 					<Input v-model="branch" placeholder="默认：master" style="width: 300px" />
+					<Tooltip max-width="200" content="此处填写 gitLab 仓库分支，默认 master 主分支。" placement="right">
+						<Icon type="ios-help-circle-outline tip" size="22" />
+					</Tooltip>
 				</div>
 				<div v-if="modeType==='1'">
 					<label>部署命令：</label>
 					<Input v-model="order" placeholder="例如：cnpm run build" style="width: 300px" />
+					<Tooltip max-width="200" content="最好填写项目打包指令，不建议填写开发指令，支持 cnpm 和 npm 指令。" placement="right">
+						<Icon type="ios-help-circle-outline tip" size="22" />
+					</Tooltip>
 				</div>
 				<div v-if="modeType==='1'">
 					<label>打包目录：</label>
 					<Input v-model="dist" placeholder="默认：dist" style="width: 300px" />
+					<Tooltip max-width="200" content="此处填写此项目的打包目录。" placement="right">
+						<Icon type="ios-help-circle-outline tip" size="22" />
+					</Tooltip>
 				</div>
 
 				<div v-if="modeType==='0'">
@@ -76,6 +92,9 @@
 						</uploader-drop>
 						<uploader-list></uploader-list>
 					</uploader>
+					<Tooltip max-width="200" content="选择上传此项目的打包目录即可。" placement="right">
+						<Icon type="ios-help-circle-outline tip" size="22" />
+					</Tooltip>
 				</div>
 
 				<div class="banben">
@@ -91,9 +110,54 @@
 						<span>{{version}}</span>
 					</div>
 				</div>
+				<div class="banben">
+					<div style="width:135px">
+						<label>部署方式：</label>
+						<span>自动部署</span>
+					</div>
+					<Tooltip max-width="200" content="此次部署之后，只要提交代码到 GitLab 仓库即可自动化部署。" placement="right">
+						<Icon type="ios-help-circle-outline tip" size="22" />
+					</Tooltip>
+				</div>
 				<div>
 					<label>部署摘要：</label>
 					<Input v-model="remark" type="textarea" :rows="4" placeholder="请输入概要内容...'" />
+				</div>
+				<div class="tip-box">
+					<div v-if="modeType==='1'">
+						<h3>
+							<Icon type="ios-help-circle-outline" size="18" />
+							<span @click="handleHelp" :class="isHelp?'active':''">关联 GitLab 仓库</span>
+						</h3>
+						<div class="tisi" v-if="isHelp">
+							<div>
+								1、打开路径：
+								<a
+									href="http://10.0.86.12/"
+									target="_blank"
+								>本项目仓库 -> Settings -> Webhooks -> Add webhook</a>
+							</div>
+							<div>
+								2、在
+								<span class="code">Target URL</span> 中填入
+								<span class="url">http://10.0.88.46:82/api/deploy/git</span> 地址
+							</div>
+							<div>
+								3、
+								<span class="code">POST Content Type</span> 选择
+								<span class="select">application/json</span>
+							</div>
+							<div>
+								4、在
+								<span class="code">Secret</span> 中填入项目名称（与下面的所属项目保持一致）
+							</div>
+							<div>
+								5、
+								<span class="code">Trigger On</span>选择
+								<span class="select">Push Events</span>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 			<div slot="footer">
@@ -126,6 +190,8 @@
 				oneBugIsShow: false,
 				isUpLoader: true,
 				zzcAutoSubmit: false,
+				isHelp: false,
+				isEx: false,
 				uploader_key: new Date().getTime(), //这个用来刷新组件--解决不刷新页面连续上传的缓存上传数据（注：每次上传时，强制这个值进行更改---根据自己的实际情况重新赋值）
 				options: {
 					target: this.$url + "/api/deploy/files/add", //SpringBoot后台接收文件夹数据的接口
@@ -155,6 +221,7 @@
 				sideList: [],
 				// itemData: {}, //静态数据
 				projectNameData: {}, //单个数据
+				mkdirArr: [], //服务器目录
 
 				dist: "dist",
 				modeType: "0",
@@ -167,8 +234,17 @@
 		},
 		watch: {
 			root(val) {
-				this.options.query.root = val;
-			},
+				let arr = this.mkdirArr.filter(item => {
+					return item === val;
+				});
+				if (arr.length == 0) {
+					this.options.query.root = val;
+					this.isEx = false;
+				} else {
+					this.options.query.root = "";
+					this.isEx = true;
+				}
+			}
 			// projectName(val) {
 			// 	// if (val != this.itemData.projectName) {
 			// 	// 	this.version = "1.0.1";
@@ -197,6 +273,7 @@
 					this.getProjectNameData();
 				}
 			});
+			this.getMkdir();
 		},
 		methods: {
 			handleClear() {
@@ -259,6 +336,16 @@
 			//所选择的文件们添加到上传队列后触发。
 			onFileSubmitted: function(files, fileList) {
 				// console.log(files, fileList);
+			},
+			getMkdir() {
+				this.$axios
+					.post("/api/deploy/files/read")
+					.then(res => {
+						this.mkdirArr = res.data.mkdir;
+					})
+					.catch(function(error) {
+						console.log(error);
+					});
 			},
 			getBidData() {
 				let arr = this.versionVal.split(".");
@@ -489,6 +576,9 @@
 			handleCharge(val) {
 				this.modeType = val;
 			},
+			handleHelp() {
+				this.isHelp = !this.isHelp;
+			},
 
 			// 获取单个数据
 			getProjectNameData() {
@@ -550,6 +640,69 @@
 	};
 </script>
 <style lang="scss" scoped>
+	.isEx {
+		color: red;
+		margin-left: 10px;
+	}
+	.tip {
+		margin-left: 15px;
+	}
+	.tip:hover {
+		color: #2d8cf0;
+		cursor: pointer;
+	}
+	.tip-box {
+		position: absolute;
+		top: 0;
+		right: 0;
+		h3 {
+			margin-bottom: 10px;
+			text-align: right;
+			font-size: 14px;
+			font-weight: 400;
+			margin-right: 10px;
+			opacity: 0.8;
+			span {
+				cursor: pointer;
+				margin-left: 5px;
+			}
+			span:hover,
+			.active {
+				color: #2d8cf0;
+			}
+			i {
+				cursor: pointer;
+			}
+		}
+		.tisi {
+			border: 1px dashed #ffd77a;
+			background-color: #fff9e646;
+			border-radius: 4px;
+			padding: 20px;
+			margin: 10px;
+			> div {
+				font-size: 12px;
+				color: #515a6e;
+				line-height: 1.5;
+				color: #515a6e;
+				margin-bottom: 6px;
+				.url {
+					color: #2d8cf0;
+				}
+				.code {
+					color: #fa795e;
+				}
+				.select {
+					padding: 2px 4px;
+					font-size: 90%;
+					color: #c7254e;
+					background-color: #f9f2f4;
+					border-radius: 4px;
+					margin: 0 5px;
+				}
+			}
+		}
+	}
 	.uploader-example {
 		width: 300px;
 		font-size: 12px;
@@ -590,6 +743,7 @@
 	}
 	.warp {
 		padding-bottom: 20px;
+		position: relative;
 		img {
 			display: block;
 			width: 218px;
@@ -657,7 +811,7 @@
 			border: 0;
 		}
 		.add-clear {
-			margin-left: 20px;
+			margin-left: 15px;
 		}
 		.uploader-btn {
 			text-align: center !important;

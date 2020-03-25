@@ -13,6 +13,7 @@ import 'font-awesome/css/font-awesome.css';
 import axios from 'axios';
 import qs from 'qs';
 axios.defaults.baseURL = process.env.VUE_APP_URL;
+axios.defaults.timeout = 15 * 60 * 1000;
 Vue.prototype.$url = process.env.VUE_APP_URL;
 Vue.prototype.$axios = axios;
 Vue.prototype.$qs = qs;
@@ -34,10 +35,10 @@ const whiteList = ['/taskadcsedw'];//不需要登录能访问的path
 router.beforeEach((to, from, next) => {
   // console.log('beforeEach');
   // let userInfo = JSON.parse(sessionStorage.getItem('state'));//获取缓存看是否登录过
-  
+
   let state = sessionStorage.getItem('state');//获取缓存看是否登录过
   if (whiteList.indexOf(to.path) < 0) {//访问了需要登录才能访问的页面
-    if (state=='true') {//登录过来直接进去
+    if (state == 'true') {//登录过来直接进去
       next();
     } else {
       if (to.path == '/login') {
@@ -84,10 +85,10 @@ import hljs from 'highlight.js'; //导入代码高亮文件
 // import 'highlight.js/styles/tomorrow-night.css'  //导入代码高亮样式
 import 'highlight.js/styles/tomorrow.css';  //导入代码高亮样式
 //自定义一个代码高亮指令
-Vue.directive('highlight',function (el) {
+Vue.directive('highlight', function (el) {
   let highlight = el.querySelectorAll('pre');
-  highlight.forEach((block)=>{
-      hljs.highlightBlock(block)
+  highlight.forEach((block) => {
+    hljs.highlightBlock(block)
   })
 });
 
