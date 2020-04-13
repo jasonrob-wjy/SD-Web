@@ -4,19 +4,19 @@ import Router from 'vue-router';
 Vue.use(Router)
 
 export default new Router({
-  mode: 'history',
-  // mode: 'hash',
+  // mode: 'history',
+  mode: 'hash',
   routes: [
     {
       path: '/login',
       name: 'login',
       component: () => import('../components/Login')
     },
-    {
-      path: '/home',
-      name: 'home',
-      component: () => import('../components/viwe/home/Index.vue')
-    },
+    // {
+    //   path: '/home',
+    //   name: 'home',
+    //   component: () => import('../components/viwe/home/Index.vue')
+    // },
     // {
     //   path: '/xlsx',
     //   name: 'xlsx',

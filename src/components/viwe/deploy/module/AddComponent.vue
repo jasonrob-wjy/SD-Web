@@ -73,6 +73,16 @@
 						:options="options"
 						ref="uploader"
 						class="uploader-example"
+						@file-complete="fileComplete"
+						@complete="complete"
+						:autoStart="true"
+						:fileStatusText="fileStatusText"
+					>
+						<!-- <uploader
+						:key="uploader_key"
+						:options="options"
+						ref="uploader"
+						class="uploader-example"
 						@file-success="onFileSuccess"
 						@upload-start="onFileStart"
 						@file-removed="onFileRemoved"
@@ -82,7 +92,7 @@
 						@complete="complete"
 						:autoStart="true"
 						:fileStatusText="fileStatusText"
-					>
+						>-->
 						<!-- <uploader-drop>拖拽上传<uploader-drop/> -->
 						<uploader-unsupport></uploader-unsupport>
 						<uploader-drop class="uploader-drop-botton" v-if="isUpLoader">
@@ -110,7 +120,7 @@
 						<span>{{version}}</span>
 					</div>
 				</div>
-				<div class="banben">
+				<div class="banben" v-if="modeType==='1'">
 					<div style="width:135px">
 						<label>部署方式：</label>
 						<span>自动部署</span>
@@ -156,6 +166,13 @@
 								<span class="code">Trigger On</span>选择
 								<span class="select">Push Events</span>
 							</div>
+							<div>
+								注意：另外需要在项目的
+								<span class="code">vue.config.js</span> 文件中添加
+								<span class="select">publicPath: './（部署目录）'</span> 配置项。
+								例如：
+								<span class="select">publicPath: './sc'</span>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -195,11 +212,11 @@
 				uploader_key: new Date().getTime(), //这个用来刷新组件--解决不刷新页面连续上传的缓存上传数据（注：每次上传时，强制这个值进行更改---根据自己的实际情况重新赋值）
 				options: {
 					target: this.$url + "/api/deploy/files/add", //SpringBoot后台接收文件夹数据的接口
-					testChunks: false, //是否分片-不分片
 					query: {
-						version: "1.0.1",
-						root: ""
+						root: "",
+						version: ""
 					},
+					testChunks: false, //是否分片-不分片
 					fileParameterName: "file" //上传文件时文件的参数名，默认file
 				},
 				root: "",
@@ -227,7 +244,7 @@
 				modeType: "0",
 				gitUrl: "", //git 地址
 				branch: "master", //git 分支
-				order: "" //部署命令
+				order: "cnpm run build" //部署命令
 				// mode: "静态部署" //模式
 				// ----------------------------------------------------
 			};
@@ -237,11 +254,10 @@
 				let arr = this.mkdirArr.filter(item => {
 					return item === val;
 				});
-				if (arr.length == 0) {
+				if (arr.length === 0) {
 					this.options.query.root = val;
 					this.isEx = false;
 				} else {
-					this.options.query.root = "";
 					this.isEx = true;
 				}
 			}
@@ -257,6 +273,7 @@
 			// 	// }
 			// }
 		},
+		
 		mounted() {
 			let author = this.$store.state.user.info;
 			this.author = author.name;
@@ -281,15 +298,15 @@
 				this.dist = "dist";
 				this.gitUrl = "";
 				this.branch = "master";
-				this.order = "";
+				this.order = "cnpm run build";
 				this.root = "";
 				this.version = "1.0.1";
 				this.versionVal = "1.0.1";
+				this.options.query.version =  "1.0.1";
+				this.options.query.root = "";
 				this.projectName = "";
 				this.idDeployment = "yes";
 				this.catalog = "";
-				this.options.query.version = this.version;
-				this.options.query.root = this.root;
 			},
 			handleAddClear() {
 				this.isAddClear = !this.isAddClear;
@@ -313,30 +330,30 @@
 				this.catalog = catalog.name;
 				this.isUpLoader = false;
 			},
-			//注，这里从文件夹每上传成功一个文件会调用一次这个方法
-			onFileSuccess: function(rootFile, file, response, chunk) {
-				// console.log("上传成功");
-				//这里可以根据response（接口）返回的数据处理自己的实际问题（如：从response拿到后台返回的想要的数据进行组装并显示）
-			},
-			//开始上传。
-			onFileStart: function(file) {
-				// console.log("开始上传");
-				// console.log(file);
-			},
-			//移除一个文件（文件夹）。
-			onFileRemoved: function(file) {
-				// console.log("移除一个文件");
-				// console.log(file);
-			},
-			//添加了一个文件，一般用作文件校验，如果给 file 增加 ignored 属性为 true 的话就会被过滤掉。
-			onFileAdded: function(file) {
-				// console.log("添加了一个文件");
-				// console.log(file);
-			},
-			//所选择的文件们添加到上传队列后触发。
-			onFileSubmitted: function(files, fileList) {
-				// console.log(files, fileList);
-			},
+			// //注，这里从文件夹每上传成功一个文件会调用一次这个方法
+			// onFileSuccess: function(rootFile, file, response, chunk) {
+			// 	// console.log("上传成功");
+			// 	//这里可以根据response（接口）返回的数据处理自己的实际问题（如：从response拿到后台返回的想要的数据进行组装并显示）
+			// },
+			// //开始上传。
+			// onFileStart: function(file) {
+			// 	// console.log("开始上传");
+			// 	// console.log(file);
+			// },
+			// //移除一个文件（文件夹）。
+			// onFileRemoved: function(file) {
+			// 	// console.log("移除一个文件");
+			// 	// console.log(file);
+			// },
+			// //添加了一个文件，一般用作文件校验，如果给 file 增加 ignored 属性为 true 的话就会被过滤掉。
+			// onFileAdded: function(file) {
+			// 	// console.log("添加了一个文件");
+			// 	// console.log(file);
+			// },
+			// //所选择的文件们添加到上传队列后触发。
+			// onFileSubmitted: function(files, fileList) {
+			// 	// console.log(files, fileList);
+			// },
 			getMkdir() {
 				this.$axios
 					.post("/api/deploy/files/read")
@@ -361,13 +378,12 @@
 					arr[2] = arr[2] * 1 + 1;
 				}
 				this.version = arr[0] + "." + arr[1] + "." + arr[2];
+				this.options.query.version = this.version;
+				this.options.query.root = this.projectNameData.root;
 				this.root = this.projectNameData.root;
 				this.projectName = this.projectNameData.projectName;
 				this.uid = this.projectNameData.bid;
 				this.catalog = this.projectNameData.catalog;
-
-				this.options.query.version = this.version;
-				this.options.query.root = this.root;
 			},
 
 			// 部署
@@ -404,7 +420,7 @@
 					dist: this.dist ? this.dist : "dist",
 					gitUrl: this.gitUrl, //git 地址
 					branch: this.branch ? this.branch : "master", //git 分支
-					order: this.order, //部署命令
+					order: this.order ? this.order : "cnpm run build", //部署命令
 					mode: this.modeType //模式  cnpm run build
 				};
 				this.$Message.loading({
@@ -420,12 +436,9 @@
 								background: true,
 								content: "部署成功！"
 							});
-							let time = setTimeout(() => {
-								clearTimeout(time);
-								this.zzcAutoSubmit = false;
-								this.$event.emit("on-success", res.data);
-								this.handleShow(false);
-							}, 3000);
+							this.zzcAutoSubmit = false;
+							this.$event.emit("on-success", res.data);
+							this.handleShow(false);
 						} else {
 							this.$Message["error"]({
 								background: true,
@@ -564,6 +577,7 @@
 					});
 			},
 			handleZzcAutoSubmit() {
+				this.$Message.destroy();
 				this.$Message["warning"]({
 					background: true,
 					content: "项目正在部署中，请耐心等待~"
@@ -582,6 +596,7 @@
 
 			// 获取单个数据
 			getProjectNameData() {
+				this.$Message.destroy();
 				let data = {
 					projectName: this.projectName,
 					select: "one"
@@ -680,6 +695,7 @@
 			border-radius: 4px;
 			padding: 20px;
 			margin: 10px;
+			width: 410px;
 			> div {
 				font-size: 12px;
 				color: #515a6e;

@@ -18,7 +18,7 @@ module.exports = {
   
     },
     //输出打包文件目录
-    outputDir: process.env.NODE_ENV === "development" ? 'devdist' : 'dist'
-    // lintOnSave: false // 取消 eslint 验证
+    outputDir: process.env.NODE_ENV === "development" ? 'devdist' : 'dist',
+    lintOnSave: false // 取消 eslint 验证
   }
   
