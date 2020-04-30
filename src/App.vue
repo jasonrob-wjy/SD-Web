@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <transition name="show">
-       <router-view />
+    <transition name="fade" mode="out-in">
+      <router-view/>
     </transition>
   </div>
 </template>
@@ -9,8 +9,8 @@
 <script>
 export default {
   name: "app",
-
   mounted() {
+    // console.log(this.$mock);
     //*****************************解决刷新页面数据丢失开始**************************************** */
     if (sessionStorage.getItem("store")) {
       this.$store.replaceState(

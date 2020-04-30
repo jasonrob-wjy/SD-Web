@@ -1,0 +1,192 @@
+.login {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    // background: url("../../assets/bg1.jpg") 100% 100% no-repeat;
+    // background-size: cover;
+    background: linear-gradient(60deg, rgba(84, 58, 183, 1) 0%, rgba(0, 172, 193, 1) 100%);
+    .logo {
+        position: fixed;
+        top: 10%;
+        color: #fff;
+        font-size: 45px;
+    }
+    .warp {
+        width: 450px;
+        background: rgba(255, 255, 255, 0.582);
+        border-radius: 10px;
+        overflow: hidden;
+        padding: 20px;
+        color: #333333b9;
+        box-shadow: 0px 0px 20px rgba(6, 17, 47, 0.7);
+        h2 {
+            display: block;
+            font-family: "Microsoft Yahei";
+            // font-size: 39px;
+
+            line-height: 1.2;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .error {
+            span {
+                padding: 3px 0;
+                color: #ff552e;
+                font-size: 13px;
+                i {
+                    margin-right: 3px;
+                }
+            }
+        }
+
+        > div {
+            margin: 12px 0;
+            > p {
+                display: flex;
+                justify-content: space-between;
+                padding: 3px 6px;
+            }
+            span {
+                display: block;
+                // font-weight: 600;
+                margin: 5px 0;
+            }
+
+            input {
+                width: 100%;
+                height: 42px;
+                padding-left: 25px;
+                box-sizing: border-box;
+                outline: 0;
+                border: 1px solid #ebebeb;
+                text-indent: 15px;
+                font-size: 14px;
+                line-height: 42px;
+                border-radius: 8px;
+            }
+            .in-box {
+                position: relative;
+                i {
+                    position: absolute;
+                    left: 8px;
+                    font-size: 20px;
+                    bottom: 12px;
+                }
+                // .getemail::before{
+                //   content: "";
+                //   position: absolute;
+                //   display: block;
+                //   height: 20px;
+                //   width: 2px;
+                //   bottom: 0;
+                //   background-color: #999;
+                //   right: 0;
+                // }
+                .getemail:hover {
+                    color: #57a3f3;
+                }
+                .getemail {
+                    position: absolute;
+                    right: 0;
+                    bottom: 0;
+                    padding: 5px 6px;
+                    margin: 0;
+                    cursor: pointer;
+                    border-left: 1px solid #ebebeb;
+                }
+            }
+        }
+        .button {
+            width: 100%;
+            padding: 5px 10px;
+            outline: 0;
+            border: 0;
+            background: #ff552e;
+            cursor: pointer;
+            text-align: center;
+            border-radius: 8px;
+            margin: 10px 0;
+            span {
+                color: #fff;
+            }
+        }
+    }
+}
+.bolang {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    height: 25vh;
+    opacity: 0.8;
+    .waves {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        margin-bottom: -7px;
+        /*Fix for safari gap*/
+        // min-height: 100px;
+        // max-height: 150px;
+    }
+
+    .content {
+        position: relative;
+        height: 20vh;
+        text-align: center;
+        background-color: white;
+    }
+
+    /* Animation */
+
+    .parallax > use {
+        animation: move-forever 25s cubic-bezier(0.55, 0.5, 0.45, 0.5) infinite;
+    }
+
+    .parallax > use:nth-child(1) {
+        animation-delay: -2s;
+        animation-duration: 7s;
+    }
+
+    .parallax > use:nth-child(2) {
+        animation-delay: -3s;
+        animation-duration: 10s;
+    }
+
+    .parallax > use:nth-child(3) {
+        animation-delay: -4s;
+        animation-duration: 13s;
+    }
+
+    .parallax > use:nth-child(4) {
+        animation-delay: -5s;
+        animation-duration: 20s;
+    }
+
+    @keyframes move-forever {
+        0% {
+            transform: translate3d(-90px, 0, 0);
+        }
+
+        100% {
+            transform: translate3d(85px, 0, 0);
+        }
+    }
+
+    /*Shrinking for mobile*/
+    @media (max-width: 768px) {
+        .waves {
+            height: 40px;
+            min-height: 40px;
+        }
+
+        .content {
+            height: 30vh;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+    }
+}

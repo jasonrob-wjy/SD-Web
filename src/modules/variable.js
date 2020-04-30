@@ -1,25 +1,17 @@
 const state = {
-  positionIsShow: false,
-  user: { name: 'zll', url: '' },
-  rowData: null,
-  sideList: null,
-  projectName: null,
+  projectTitleArr:[],
+  info: null,
+  itemData:{}
 }
 const mutations = {
-  setSideList(state, data) {
-    state.sideList = data;
+  setProjectTitleArr(state, data) {
+    state.projectTitleArr = data;
   },
-  setProjectName(state, data) {
-    state.projectName = data;
-  },
-  setRowData(state, data) {
-    state.rowData = data;
-  },
-  setPositionIsShow(state, data) {
-    state.positionIsShow = data;
+  setItemData(state, data) {
+    state.itemData = data;
   },
   setUser(state, data) {
-    state.user = data;
+    state.info = data;
   }
 }
 const actions = {
@@ -28,13 +20,13 @@ const actions = {
   }
 }
 const getters = {
-  // //获文章取条获件分页列表
-  // getArticleReplyPage(state) {
-  //   return function (pageNo, pageSize) {
-  //     let list = 0;
-  //     return list;
-  //   }
-  // }
+  //获文章取条获件分页列表
+  getArticleReplyPage(state) {
+    return function (pageNo, pageSize) {
+      let list = 0;
+      return list;
+    }
+  }
 }
 export default {
   state,

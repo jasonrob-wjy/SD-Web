@@ -1,9 +1,7 @@
 
-#app, body, html {
-    width: 100%;
-    height: 100%;
-}
-// 切换动画
+// body{
+//     background-color: red;
+// }
 .show-enter-active{
    transition:all 0.25s ease-in;
 }
@@ -30,194 +28,245 @@
     opacity: 1;
     /* transform: scale(1); */
 }
-
-// 全局样式
+body{
+    background: #f5f7fa !important;
+}
 ul,ol{
-      list-style: none;
+    list-style: none;
 }
-.ivu-card{
-    margin-bottom: 15px;
+section {
+    display: flex !important;;
+    justify-content: center;
+    padding: 15px 0 !important;;;
+    .box{
+        width: 80%;
+    }
+    >div,>ul{
+        width: 80%;
+    }
 }
-
-.layout-con {
-    height: 100%;
-    width: 100%;
-  }
-  .menu-item span {
-    display: inline-block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    vertical-align: bottom;
-    transition: width 0.2s ease 0.2s;
-  }
-  .menu-item i {
-    transform: translateX(0px);
-    transition: font-size 0.2s ease, transform 0.2s ease;
-    vertical-align: middle;
-    font-size: 16px;
-  }
-  .collapsed-menu span {
-    width: 0px;
-    transition: width 0.2s ease;
-  }
-  .collapsed-menu i {
-    transform: translateX(5px);
-    transition: font-size 0.2s ease 0.2s, transform 0.2s ease 0.2s;
-    vertical-align: middle;
-    font-size: 22px;
-  }    
-  .ivu-layout-sider{
-      box-shadow: 2px 0 8px 0 rgba(29,35,41,.05);
-
-}
-
-.main .ivu-select-selection,.main .ivu-input,.main .ivu-input-group-append,.main .ivu-btn{
-    border-radius: 0;
-}
-body .ivu-modal {
-  margin-bottom: 50px;
-  top: 50px;
-}
-.main .ivu-table-wrapper,.main .ivu-table{
-  overflow: initial;
-}
-.ivu-table-cell {
-  > div {
+.page {
+    padding-top: 25px;
+    border-top: 1px solid #e8eaec;
+    padding-bottom: 10px;
     display: flex;
-    align-items: center;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+html,body,#app{
+    width: 100%;
+    height: 100%;
+}
+
+
+
+@keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
-  i{
-    cursor: pointer;
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
   }
-}
-//字体
-.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=SimSun]::before,
-.ql-snow .ql-picker.ql-font .ql-picker-item[data-value=SimSun]::before {
-    content: "宋体";
-    font-family: "SimSun";
-}
-.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=SimHei]::before,
-.ql-snow .ql-picker.ql-font .ql-picker-item[data-value=SimHei]::before {
-	content: "黑体";
-	font-family: "SimHei";
-}
-.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=Microsoft-YaHei]::before,
-.ql-snow .ql-picker.ql-font .ql-picker-item[data-value=Microsoft-YaHei]::before {
-	content: "微软雅黑";
-	font-family: "Microsoft YaHei";
-}
-.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=KaiTi]::before,
-.ql-snow .ql-picker.ql-font .ql-picker-item[data-value=KaiTi]::before {
-	content: "楷体";
-	font-family: "KaiTi";
-}
-.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=FangSong]::before,
-.ql-snow .ql-picker.ql-font .ql-picker-item[data-value=FangSong]::before {
-	content: "仿宋";
-	font-family: "FangSong";
-}
-.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=Arial]::before,
-.ql-snow .ql-picker.ql-font .ql-picker-item[data-value=Arial]::before {
-	content: "Arial";
-	font-family: "Arial";
-}
-.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=Times-New-Roman]::before,
-.ql-snow .ql-picker.ql-font .ql-picker-item[data-value=Times-New-Roman]::before {
-	content: "Times New Roman";
-	font-family: "Times New Roman";
-}
-.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=sans-serif]::before,
-.ql-snow .ql-picker.ql-font .ql-picker-item[data-value=sans-serif]::before {
-	content: "sans-serif";
-	font-family: "sans-serif";
-}
- 
-.ql-font-SimSun {
-  	font-family: "SimSun";
-}
-.ql-font-SimHei {
-  	font-family: "SimHei";
-}
-.ql-font-Microsoft-YaHei {
-  	font-family: "Microsoft YaHei";
-}
-.ql-font-KaiTi {
-  	font-family: "KaiTi";
-}
-.ql-font-FangSong {
-  	font-family: "FangSong";
-}
-.ql-font-Arial {
-  	font-family: "Arial";
-}
-.ql-font-Times-New-Roman {
-  	font-family: "Times New Roman";
-}
-.ql-font-sans-serif {
-  	font-family: "sans-serif";
-}
-
-.code{
-  padding: 2px 4px;
-    font-size: 90%;
-    color: #c7254e;
-    background-color: #f9f2f4;
-    border-radius: 4px;
-    margin: 0 5px;
-}
-
-::-webkit-scrollbar{
-  width:8px;
-  height:8px;
-  background-color:#fff
-}
-::-webkit-scrollbar-track{
-  box-shadow:inset 0 0 6px rgba(0, 0, 0, .2);
-  border-radius:5px;
-  background-color:#eee}
-::-webkit-scrollbar-thumb{
-  border-radius:5px;
-  box-shadow:inset 0 0 6px rgba(0, 0, 0, .2);
-  background-color:#ccc;
-  transition: all .3s;
-}
-::-webkit-scrollbar-thumb:hover{
-  background-color:#45b6f7;
-}
-.content-right{
-  background-color: #fff;
-  border: 1px solid #e8eaec;
-  margin: 5px 10px;
-  margin-right: 0;
-}
-.ivu-layout-header{
-  z-index: 100;
-  overflow: hidden;
-}
-
-.web-box {
-  width: 100%;
-  padding: 10px;
-  margin: auto;
-  background-color: #fff;
-  border-radius: 3px;
-  margin-bottom: 10px;
-}
-.demo-spin-col {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 480px;
-  .fa-pulse {
-    font-size: 28px;
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translate3d(0, -100%, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
-}
-
-pre{
-  margin: 8px 0;
-  padding: 8px 0;
-  background-color: #f5f5f5de !important;
-  border: 1px solid #eee;
-  border-radius: 6px;
-}
+  @keyframes fadeOutDown {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+      transform: translate3d(0, 100%, 0);
+    }
+  }
+  @keyframes fadeInLeft {
+    from {
+      opacity: 0;
+      transform: translate3d(-100%, 0, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes fadeOutLeft {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+      transform: translate3d(-100%, 0, 0);
+    }
+  }
+  @keyframes fadeInRight {
+    from {
+      opacity: 0;
+      transform: translate3d(100%, 0, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes fadeOutRight {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+      transform: translate3d(100%, 0, 0);
+    }
+  }
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 100%, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes fadeOutUp {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+      transform: translate3d(0, -100%, 0);
+    }
+  }
+  
+  .fade-enter-active,
+  .fadeIn,
+  .fade-leave-active,
+  .fadeOut {
+    animation-duration: .2s;
+    animation-fill-mode: both;
+  }
+  .fade-enter-active,
+  .fadeIn {
+    animation-name: fadeIn;
+  }
+  .fade-leave-active,
+  .fadeOut {
+    animation-name: fadeOut;
+  }
+  
+  .fadeUp-enter-active,
+  .fadeInUp,
+  .fadeUp-leave-active,
+  .fadeOutUp {
+    animation-duration: .5s;
+    animation-fill-mode: both;
+  }
+  .fadeUp-enter-active,
+  .fadeInUp {
+    animation-name: fadeInUp;
+  }
+  .fadeUp-leave-active,
+  .fadeOutUp {
+    animation-name: fadeOutUp;
+  }
+  
+  .fadeRight-enter-active,
+  .fadeInRight,
+  .fadeRight-leave-active,
+  .fadeOutRight {
+    animation-duration: .5s;
+    animation-fill-mode: both;
+  }
+  .fadeRight-enter-active,
+  .fadeInRight {
+    animation-name: fadeInRight;
+  }
+  .fadeRight-leave-active,
+  .fadeOutRight {
+    animation-name: fadeOutRight;
+  }
+  
+  .fadeLeft-enter-active,
+  .fadeInLeft,
+  .fadeLeft-leave-active,
+  .fadeOutLeft {
+    animation-duration: .5s;
+    animation-fill-mode: both;
+  }
+  .fadeLeft-enter-active,
+  .fadeInLeft {
+    animation-name: fadeInLeft;
+  }
+  .fadeLeft-leave-active,
+  .fadeOutLeft {
+    animation-name: fadeOutLeft;
+  }
+  
+  .fadeDown-enter-active,
+  .fadeInDown,
+  .fadeDown-leave-active,
+  .fadeOutDown {
+    animation-duration: .5s;
+    animation-fill-mode: both;
+  }
+  .fadeDown-enter-active,
+  .fadeInDown {
+    animation-name: fadeInDown;
+  }
+  .fadeDown-leave-active,
+  .fadeOutDown {
+    animation-name: fadeOutDown;
+  }
+  
+  @keyframes zoomIn {
+    from {
+      opacity: 0;
+      transform: scale3d(0.3, 0.3, 0.3);
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  @keyframes zoomOut {
+    from {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+      transform: scale3d(0.3, 0.3, 0.3);
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  .zoom-enter-active,
+  .zoomIn,
+  .zoom-leave-active,
+  .zoomOut {
+    animation-duration: .5s;
+    animation-fill-mode: both;
+  }
+  .zoom-enter-active,
+  .zoomIn {
+    animation-name: zoomIn;
+  }
+  .zoom-leave-active,
+  .zoomOut {
+    animation-name: zoomOut;
+  }
+  
