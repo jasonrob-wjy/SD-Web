@@ -1,19 +1,21 @@
 <template>
   <div class="header">
     <div>
-      <Menu mode="horizontal" :theme="theme" active-name="1">
-        <!-- <Input v-model="value14" placeholder="Enter something..." clearable style="width: 100px" /> -->
-        <MenuItem name="1" to="/">
-          <Icon type="ios-home" size="18" />工作台
-        </MenuItem>
-      
-        <MenuItem name="2" to="/addpage">
-         <Icon type="md-bookmarks" size="18" />创建项目
-        </MenuItem> 
-         <MenuItem name="3" to="/profile">
-          <Icon type="ios-person" size="24" />个人中心
-        </MenuItem>
-        <!-- <Submenu name="3">
+      <div class="he-left">
+        <h1>Web Deploy</h1>
+        <Menu mode="horizontal" :theme="theme" active-name="1">
+          <!-- <Input v-model="value14" placeholder="Enter something..." clearable style="width: 100px" /> -->
+          <MenuItem name="1" to="/">
+            <Icon type="md-cube" size="18" />工作台
+          </MenuItem>
+
+          <MenuItem name="2" to="/addpage">
+            <Icon type="md-add" size="20" />创建项目
+          </MenuItem>
+          <MenuItem name="3" to="/profile">
+            <Icon type="ios-person" size="24" />个人中心
+          </MenuItem>
+          <!-- <Submenu name="3">
           <template slot="title">
             <Icon type="ios-stats" />使用文档
           </template>
@@ -26,11 +28,13 @@
             <MenuItem name="3-4">用户留存</MenuItem>
             <MenuItem name="3-5">流失用户</MenuItem>
           </MenuGroup>
-        </Submenu>-->
-        <MenuItem name="4" to="/docs">
-          <Icon type="md-list-box" size="20" />说明文档
-        </MenuItem>
-      </Menu>
+          </Submenu>-->
+          <MenuItem name="4" to="/docs">
+            <Icon type="ios-book" size="20" />说明文档
+          </MenuItem>
+        </Menu>
+      </div>
+      <Input v-model="inputVal" search placeholder="查找项目..." style="width: 200px" />
       <Dropdown class="dropdown-menu">
         <div class="heade-menu">
           <img :src="$url+user.url" />
@@ -52,11 +56,20 @@ export default {
   data() {
     return {
       theme: "dark",
+      inputVal: "",
       user: {}
     };
   },
+  watch: {
+    inputVal(val) {
+      this.$event.emit("input", val);
+    }
+  },
   mounted() {
     this.user = this.$store.state.variable.info;
+    // this.$event.on("inputClear", val => {
+    //   this.inputVal = val;
+    // });
   },
   methods: {
     handleQuit() {

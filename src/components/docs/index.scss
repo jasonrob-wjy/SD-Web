@@ -4,4 +4,11 @@ section > div {
 }
 .docs-page {
   padding: 20px;
+  h1{
+    padding-bottom: .3em;
+    border-bottom: 1px solid #eaecef;
+  }
+  p{
+    margin: 8px 0;
+  }
 }

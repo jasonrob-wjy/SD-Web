@@ -21,8 +21,8 @@ export default new Router({
       children: [ //这里就是二级路由的配置
         {
           path: '/',
-          name: 'project_list',
-          component: () => import('../components/project_list/index.vue')
+          name: 'index',
+          component: () => import('../components/index/index.vue')
         },
         {
           path: '/addpage',

@@ -119,9 +119,9 @@ export default {
   name: "login",
   data: () => ({
     isuserPass: false,
-    userPass: "",
+    userPass: "123456",
     isuserName: false,
-    userName: "",
+    userName: "Admin",
     code: "",
     email: "",
     userPass1: "",

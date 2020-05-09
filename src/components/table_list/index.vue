@@ -175,6 +175,23 @@
       @on-change="setIsShow"
         />-->
       </div>
+      <Modal v-model="isToLogin" width="360" @on-cancel="handleToLogin">
+        <p slot="header" style="color:#f60;text-align:center">
+          <Icon type="ios-information-circle"></Icon>
+          <span>权限提示</span>
+        </p>
+        <div style="text-align:center">
+          <p>由于您不是注册用户，暂无权执行此操作，请注册登录后操作！</p>
+        </div>
+        <div slot="footer">
+          <Button
+            type="info"
+            size="large"
+            long
+            @click="handleLoginModal"
+          >我要去注册</Button>
+        </div>
+      </Modal>
     </section>
   </div>
 </template>
@@ -191,6 +208,7 @@ export default {
     pageNo: 1,
     pageSize: 10,
     total: 10,
+    isToLogin: false,
     columns: [
       {
         title: "项目名称",
@@ -257,6 +275,7 @@ export default {
     titleVal: "",
     authorVal: "",
     publishVal: "",
+    user: {},
     // -----------------------------------------
     // isDetail: true,
     // mark: true,
@@ -283,11 +302,12 @@ export default {
     //   this.isOpen = false;
     // });
     // this.getUser();
+    this.user = this.$store.state.variable.info;
     this.handleGetData();
   },
   methods: {
     handleGetData() {
-      this.$Message.destroy();
+      // this.$Message.destroy();
       let data = {
         pageNo: this.pageNo,
         pageSize: this.pageSize,
@@ -317,49 +337,54 @@ export default {
     },
     //部署站点
     handleDeploy(e) {
-      let uidArr = [];
-      this.content.forEach(item => {
-        if (item.idDeployment === "yes") {
-          uidArr.push(item.bid);
-        }
-      });
-      this.$Message.destroy();
-      this.$Message.loading({
-        content: "项目部署中，请稍后...",
-        duration: 0
-      });
-      let data = {
-        root: e.root,
-        version: e.version,
-        catalog: e.catalog,
-        bid: e.bid,
-        uidArr: JSON.stringify(uidArr)
-      };
-      this.$axios
-        .post("/api/deploy/edition/transfer", this.$qs.stringify(data))
-        .then(res => {
-          this.$Message.destroy();
-          if (res.data.result) {
-            this.$Message["success"]({
-              background: true,
-              content: "项目部署成功！"
-            });
-            // this.$emit("on-reset", {});
-            this.handleGetData();
-          } else {
+      // 用户权限控制
+      if (this.user.name !== "Admin") {
+        let uidArr = [];
+        this.content.forEach(item => {
+          if (item.idDeployment === "yes") {
+            uidArr.push(item.bid);
+          }
+        });
+        this.$Message.destroy();
+        this.$Message.loading({
+          content: "项目部署中，请稍后...",
+          duration: 0
+        });
+        let data = {
+          root: e.root,
+          version: e.version,
+          catalog: e.catalog,
+          bid: e.bid,
+          uidArr: JSON.stringify(uidArr)
+        };
+        this.$axios
+          .post("/api/deploy/edition/transfer", this.$qs.stringify(data))
+          .then(res => {
+            this.$Message.destroy();
+            if (res.data.result) {
+              this.$Message["success"]({
+                background: true,
+                content: "项目部署成功！"
+              });
+              // this.$emit("on-reset", {});
+              this.handleGetData();
+            } else {
+              this.$Message["error"]({
+                background: true,
+                content: "项目部署失败！"
+              });
+            }
+          })
+          .catch(function(error) {
+            this.$Message.destroy();
             this.$Message["error"]({
               background: true,
               content: "项目部署失败！"
             });
-          }
-        })
-        .catch(function(error) {
-          this.$Message.destroy();
-          this.$Message["error"]({
-            background: true,
-            content: "项目部署失败！"
           });
-        });
+      } else {
+        this.isToLogin = true;
+      }
     },
     changePage(event) {
       this.pageNo = event;
@@ -368,6 +393,14 @@ export default {
     changeSizePage(event) {
       this.pageSize = event;
       this.handleGetData();
+    },
+    handleToLogin() {
+      this.isToLogin = false;
+    },
+    handleLoginModal() {
+      window.sessionStorage.clear();
+      this.$store.commit("setUser", {});
+      this.$router.push({ path: "/login" });
     },
     // ********************************************************
     setData(data) {

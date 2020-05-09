@@ -47,7 +47,7 @@
         <div class="he-row">
           <div class="header_left">
             <div class="logo">
-            <Icon type="ios-book" />
+              <Icon type="ios-book" />
             </div>
             <div class="header__info">
               <span>
@@ -61,7 +61,17 @@
     </header>
     <section>
       <div class="docs-page">
-       待开发...
+        <h1>Web Deploy</h1>
+        <p>Web Deploy是一个可视化，并且能快速部署前端界面的自动化服务，可以有效缩短前端界面的部署时间，从而提高前端界面的部署效率，相比家喻户晓的Jenkins来说更轻量，另外，如果使用过程中有任何问题，那么请一定要记得反馈哦。</p>
+        <h1>功能点包括</h1>
+        <p>
+          1、项目的创建、访问、删除、迭代以及项目的版本回退部署和访问等功能。
+          <br />2、部署创建分为静态部署和自动部署这两种部署异同如下：
+          <br />★ 静态部署：这种部署适用于一些静态资源的部署；
+          <br />★ 自动部署：这种部署方式适用于非静态资源之类的大型项目，例如使用脚手架 Vue-cli 等开发的项目；
+          <br />★ 开发中...；
+        </p>
+        <p></p>
       </div>
     </section>
   </div>

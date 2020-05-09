@@ -47,7 +47,7 @@
         <div class="he-row">
           <div class="header_left">
             <div class="logo">
-              <Icon type="md-person" />
+              <Icon type="md-add" />
             </div>
             <div class="header__info">
               <span>
@@ -139,7 +139,7 @@
               <Icon type="ios-help-circle-outline tip" size="22" />
             </Tooltip>
           </div>
-          <transition name="zoom" mode="out-in">
+          <transition name="fade">
             <div v-if="modeType==='1'">
               <label>项目分支：</label>
               <Input v-model="branch" placeholder="默认：master" style="width: 300px" />
@@ -148,7 +148,7 @@
               </Tooltip>
             </div>
           </transition>
-          <transition name="zoom" mode="out-in">
+          <transition name="fade">
             <div v-if="modeType==='1'">
               <label>部署命令：</label>
               <Input v-model="order" placeholder="例如：cnpm run build" style="width: 300px" />
@@ -161,7 +161,7 @@
               </Tooltip>
             </div>
           </transition>
-          <transition name="zoom" mode="out-in">
+          <transition name="fade">
             <div v-if="modeType==='1'">
               <label>打包目录：</label>
               <Input v-model="dist" placeholder="默认：dist" style="width: 300px" />
@@ -170,7 +170,7 @@
               </Tooltip>
             </div>
           </transition>
-          <transition name="zoom" mode="out-in">
+          <transition name="fade">
             <div v-if="modeType==='0'">
               <label>部署文件：</label>
               <uploader
@@ -301,6 +301,19 @@
         <!-- </Modal> -->
       </div>
     </section>
+    <!-- 权限控制 -->
+    <Modal v-model="isToLogin" width="360" @on-cancel="handleToLogin">
+      <p slot="header" style="color:#f60;text-align:center">
+        <Icon type="ios-information-circle"></Icon>
+        <span>权限提示</span>
+      </p>
+      <div style="text-align:center">
+        <p>由于您不是注册用户，暂无权执行此操作，请注册登录后操作！</p>
+      </div>
+      <div slot="footer">
+        <Button type="info" size="large" long @click="handleLoginModal">我要去注册</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
@@ -321,7 +334,9 @@ export default {
       sideList: [],
       author: "",
       url: "",
+      usre: {},
       content: {},
+      isToLogin: false,
       // **********************************************
       oneBugIsShow: false,
       isUpLoader: true,
@@ -394,9 +409,9 @@ export default {
   },
 
   mounted() {
-    let usre = this.$store.state.variable.info;
-    this.author = usre.name;
-    this.url = usre.url;
+    this.usre = this.$store.state.variable.info;
+    this.author = this.usre.name;
+    this.url = this.usre.url;
     this.sideList = this.$store.state.variable.projectTitleArr;
 
     // this.content = this.$store.state.variable.itemData;
@@ -551,134 +566,145 @@ export default {
 
     // 静态部署
     handleSubmit() {
-      this.$Message.destroy();
-      // 判断输入内容是否为空
-      if (!this.projectName) {
-        this.$Message["error"]({
-          background: true,
-          content: "请选择所属项目！"
-        });
-        return;
-      }
-      if (!this.root) {
-        this.$Message["error"]({
-          background: true,
-          content: "部署目录不得为空！"
-        });
-        return;
-      }
+      if (this.usre.name === "Admin") {
+        this.isToLogin = true;
+      } else {
+        this.$Message.destroy();
+        // 判断输入内容是否为空
+        if (!this.projectName) {
+          this.$Message["error"]({
+            background: true,
+            content: "请选择所属项目！"
+          });
+          return;
+        }
+        if (!this.root) {
+          this.$Message["error"]({
+            background: true,
+            content: "部署目录不得为空！"
+          });
+          return;
+        }
 
-      let data = {
-        projectName: this.projectName,
-        author: this.author,
-        url: this.url ? this.url : "/assets/img/dt.png",
-        idDeployment: this.idDeployment,
-        root: this.root,
-        version: this.version,
-        uid: this.uid,
-        catalog: this.catalog ? this.catalog : this.dist,
-        versionRoot: "./" + this.root + "/" + this.version,
-        remark: this.remark,
+        let data = {
+          projectName: this.projectName,
+          author: this.author,
+          url: this.url ? this.url : "/assets/img/dt.png",
+          idDeployment: this.idDeployment,
+          root: this.root,
+          version: this.version,
+          uid: this.uid,
+          catalog: this.catalog ? this.catalog : this.dist,
+          versionRoot: "./" + this.root + "/" + this.version,
+          remark: this.remark,
 
-        dist: this.dist ? this.dist : "dist",
-        gitUrl: this.gitUrl, //git 地址
-        branch: this.branch ? this.branch : "master", //git 分支
-        order: this.order ? this.order : "cnpm run build", //部署命令
-        mode: this.modeType //模式  cnpm run build
-      };
-      this.$Message.loading({
-        content: "项目部署中...",
-        duration: 0
-      });
-      this.$axios
-        .post("/api/deploy/edition/add", this.$qs.stringify(data))
-        .then(res => {
-          this.$Message.destroy();
-          if (res.data.result) {
-            this.$Message["success"]({
-              background: true,
-              content: "此项目部署成功！"
-            });
-            this.zzcAutoSubmit = false;
-            this.$router.push({ path: "/" });
-          } else {
-            this.$Message["error"]({
-              background: true,
-              content: "部署失败！"
-            });
-            this.zzcAutoSubmit = false;
-          }
-        })
-        .catch(function(error) {
-          console.log(error);
+          dist: this.dist ? this.dist : "dist",
+          gitUrl: this.gitUrl, //git 地址
+          branch: this.branch ? this.branch : "master", //git 分支
+          order: this.order ? this.order : "cnpm run build", //部署命令
+          mode: this.modeType //模式  cnpm run build
+        };
+        this.$Message.loading({
+          content: "项目部署中...",
+          duration: 0
         });
+        this.$axios
+          .post("/api/deploy/edition/add", this.$qs.stringify(data))
+          .then(res => {
+            this.$Message.destroy();
+            if (res.data.result) {
+              this.$Message["success"]({
+                background: true,
+                content: "此项目部署成功！"
+              });
+              this.zzcAutoSubmit = false;
+              this.$router.push({
+                path: "/tablePage",
+                query: { title: this.projectName }
+              });
+            } else {
+              this.$Message["error"]({
+                background: true,
+                content: "部署失败！"
+              });
+              this.zzcAutoSubmit = false;
+            }
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
+      }
     },
 
     //拉取项目(自动部署)
     handleAutoSubmit() {
-      this.$Message.destroy();
+      if (this.usre.name === "Admin") {
+        this.isToLogin = true;
+      } else {
+        this.$Message.destroy();
 
-      // 判断输入内容是否为空
-      if (!this.projectName) {
-        this.$Message["error"]({
-          background: true,
-          content: "请选择所属项目！"
+        // 判断输入内容是否为空
+        if (!this.projectName) {
+          this.$Message["error"]({
+            background: true,
+            content: "请选择所属项目！"
+          });
+          return;
+        }
+        if (!this.root) {
+          this.$Message["error"]({
+            background: true,
+            content: "部署目录不得为空！"
+          });
+          return;
+        }
+        if (!this.gitUrl) {
+          this.$Message["error"]({
+            background: true,
+            content: "Git 地址不得为空！"
+          });
+          return;
+        }
+        if (!this.order) {
+          this.$Message["error"]({
+            background: true,
+            content: "部署命令不得为空！"
+          });
+          return;
+        }
+        this.zzcAutoSubmit = true;
+        let data = {
+          gitUrl: this.gitUrl, //git 地址
+          root: this.root,
+          branch: this.branch ? this.branch : "master", //git 分支
+          order: this.order //部署命令
+        };
+        this.$Message.loading({
+          content: "请勿关闭浏览器，项目拉取中...",
+          duration: 0
         });
-        return;
+        this.$axios
+          .post("/api/deploy/auto/clone", this.$qs.stringify(data))
+          .then(res => {
+            this.$Message.destroy();
+            if (res.data.result) {
+              this.$Message["success"]({
+                background: true,
+                content: "项目拉取成功！"
+              });
+              this.handleInit(data);
+            } else {
+              this.$Message["error"]({
+                background: true,
+                content: "项目拉取失败！"
+              });
+              this.zzcAutoSubmit = false;
+            }
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
       }
-      if (!this.root) {
-        this.$Message["error"]({
-          background: true,
-          content: "部署目录不得为空！"
-        });
-        return;
-      }
-      if (!this.gitUrl) {
-        this.$Message["error"]({
-          background: true,
-          content: "Git 地址不得为空！"
-        });
-        return;
-      }
-      if (!this.order) {
-        this.$Message["error"]({
-          background: true,
-          content: "部署命令不得为空！"
-        });
-        return;
-      }
-      this.zzcAutoSubmit = true;
-      let data = {
-        gitUrl: this.gitUrl, //git 地址
-        root: this.root,
-        branch: this.branch ? this.branch : "master", //git 分支
-        order: this.order //部署命令
-      };
-      this.$Message.loading({
-        content: "请勿关闭浏览器，项目拉取中...",
-        duration: 0
-      });
-      this.$axios
-        .post("/api/deploy/auto/clone", this.$qs.stringify(data))
-        .then(res => {
-          this.$Message.destroy();
-          if (res.data.result) {
-            this.$Message["success"]({
-              background: true,
-              content: "项目拉取成功！"
-            });
-            this.handleInit(data);
-          } else {
-            this.$Message["error"]({
-              background: true,
-              content: "项目拉取失败！"
-            });
-            this.zzcAutoSubmit = false;
-          }
-        })
-        .catch(function(error) {
-          console.log(error);
-        });
     },
     //初始化项目 安装依赖
     handleInit(data) {
@@ -754,8 +780,15 @@ export default {
     },
     handleHelp() {
       this.isHelp = !this.isHelp;
+    },
+    handleToLogin() {
+      this.isToLogin = false;
+    },
+    handleLoginModal() {
+      window.sessionStorage.clear();
+      this.$store.commit("setUser", {});
+      this.$router.push({ path: "/login" });
     }
-
     // -------------------------------------------------------
 
     // handleAddClear() {

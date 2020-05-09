@@ -66,7 +66,7 @@
           <div v-if="isName">
             <label>用户名：</label>
             <span>{{name}}</span>
-            <Button type="dashed" @click="handleOnChange('yhmxg')">
+            <Button type="dashed" v-if="user.name!=='Admin'"  @click="handleOnChange('yhmxg')">
               <Icon type="ios-create-outline" size="16" />修改
             </Button>
           </div>
@@ -80,7 +80,7 @@
           <div v-if="isPassword">
             <label>用户密码：</label>
             <span>******</span>
-            <Button type="dashed" @click="handleOnChange('qrmmxg')">
+            <Button type="dashed" v-if="user.name!=='Admin'"  @click="handleOnChange('qrmmxg')">
               <Icon type="ios-create-outline" size="16" />修改
             </Button>
           </div>
@@ -101,7 +101,7 @@
           <div v-if="isEmail">
             <label>邮箱地址：</label>
             <span>{{email}}</span>
-            <Button type="dashed" @click="handleOnChange('yxdzxg')">
+            <Button type="dashed" v-if="user.name!=='Admin'" @click="handleOnChange('yxdzxg')">
               <Icon type="ios-create-outline" size="16" />修改
             </Button>
           </div>
@@ -119,7 +119,7 @@
         <div class="tx-box">
           <img :src="urlImg" />
           <Upload :action="$url+'/api/person/img'" :on-success="handleFileSuccess" :show-upload-list="false">
-            <Button icon="ios-cloud-upload-outline">上传新头像</Button>
+            <Button icon="ios-cloud-upload-outline" v-if="user.name!=='Admin'" >上传新头像</Button>
           </Upload>
         </div>
       </div>
