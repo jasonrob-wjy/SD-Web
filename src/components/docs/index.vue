@@ -1,48 +1,7 @@
 <template>
   <div>
     <header class="header__content" style="position: relative; overflow: hidden;">
-      <div class="spots">
-        <span
-          class="decorate"
-          style="background: rgb(201, 27, 0); width: 51px; height: 51px; margin-top: -25.5px; margin-left: -25.5px; top: 55.6675%; left: 5%;"
-        ></span>
-        <span
-          class="decorate"
-          style="background: rgb(23, 90, 171); width: 28px; height: 28px; margin-top: -14px; margin-left: -14px; top: 10.2246%; left: 15%;"
-        ></span>
-        <span
-          class="decorate"
-          style="background: rgb(233, 34, 36); width: 37px; height: 37px; margin-top: -18.5px; margin-left: -18.5px; top: 71.9133%; left: 25%;"
-        ></span>
-        <span
-          class="decorate"
-          style="background: rgb(0, 62, 135); width: 47px; height: 47px; margin-top: -23.5px; margin-left: -23.5px; top: 22.8839%; left: 35%;"
-        ></span>
-        <span
-          class="decorate"
-          style="background: rgb(0, 135, 231); width: 31px; height: 31px; margin-top: -15.5px; margin-left: -15.5px; top: 5.09172%; left: 45%;"
-        ></span>
-        <span
-          class="decorate"
-          style="background: rgb(23, 90, 171); width: 52px; height: 52px; margin-top: -26px; margin-left: -26px; top: 32.1525%; left: 55%;"
-        ></span>
-        <span
-          class="decorate"
-          style="background: rgb(255, 86, 0); width: 29px; height: 29px; margin-top: -14.5px; margin-left: -14.5px; top: 46.8035%; left: 65%;"
-        ></span>
-        <span
-          class="decorate"
-          style="width: 44px; height: 44px; margin-top: -22px; margin-left: -22px; top: 97.8537%; left: 75%;"
-        ></span>
-        <span
-          class="decorate"
-          style="background: rgb(201, 27, 0); width: 43px; height: 43px; margin-top: -21.5px; margin-left: -21.5px; top: 30.7088%; left: 85%;"
-        ></span>
-        <span
-          class="decorate"
-          style="width: 27px; height: 27px; margin-top: -13.5px; margin-left: -13.5px; top: 7.43497%; left: 95%;"
-        ></span>
-      </div>
+      <Decorate/>
       <div class="container">
         <div class="he-row">
           <div class="header_left">
@@ -61,27 +20,50 @@
     </header>
     <section>
       <div class="docs-page">
-        <h1>Web Deploy</h1>
-        <p>Web Deploy是一个可视化，并且能快速部署前端界面的自动化服务，可以有效缩短前端界面的部署时间，从而提高前端界面的部署效率，相比家喻户晓的Jenkins来说更轻量，另外，如果使用过程中有任何问题，那么请一定要记得反馈哦。</p>
-        <h1>功能点包括</h1>
-        <p>
-          1、项目的创建、访问、删除、迭代以及项目的版本回退部署和访问等功能。
-          <br />2、部署创建分为静态部署和自动部署这两种部署异同如下：
-          <br />★ 静态部署：这种部署适用于一些静态资源的部署；
-          <br />★ 自动部署：这种部署方式适用于非静态资源之类的大型项目，例如使用脚手架 Vue-cli 等开发的项目；
-          <br />★ 开发中...；
-        </p>
-        <p></p>
+        <h2>Web Deploy</h2>
+        <p>Web Deploy 简称（WD）是一个可视化，并且能快速部署前端界面的自动化服务，可以有效缩短前端界面的部署时间，相比家喻户晓的 Jenkins 来说更简洁、更轻量、部署时间更快速、不需要设置过多的配置项等，另外，如果使用过程中有任何问题，那么请一定要记得反馈哦。</p>
+        <h2>初识 WD</h2>
+        <div>
+          <p>1、项目的创建、访问、删除、迭代以及项目的版本回退部署和访问等功能。</p>
+          <p>2、部署创建分为静态部署和自动部署这两种部署异同如下：</p>
+          <ul>
+            <li>★ 静态部署：这种部署适用于一些静态资源的部署；</li>
+            <li>★ 自动部署：这种部署方式适用于使用脚手架开发的项目（vue-cli3.0支持最佳）；</li>
+          </ul>
+          <p>3、登录用户信息更新，支持用户名、密码、邮箱地址的修改（暂不支持密码找回）；</p>
+        </div>
+        <h2>操作方法</h2>
+        <div>
+          <h4>自动化部署</h4>
+          <div>
+            <p>第一步：填写（选择）项目名称；</p>
+            <p>第二步：上传你的静态文件夹；</p>
+            <p>第三步：选择是否立即部署；</p>
+            <p>第三步：点击提交部署即可；</p>
+          </div>
+          <h4>自动化部署</h4>
+          <div>
+            <p>第一步：在 GitLib 打开路径： 项目仓库 -> Settings -> Webhooks -> Add webhook；</p>
+            <p>第二步：在 Target URL 中填入 http://10.0.88.46:82/api/deploy/git 地址；</p>
+            <p>第三步：POST Content Type 选择 apppcation/json；</p>
+            <p>第四步：在 Secret 中填入项目名称（与所属项目保持一致）；</p>
+            <p>第五步：Trigger On 选择 Push Events；</p>
+            <p>注意：若使用 vue-cli3.0 脚手架打包后上传 dist 文件夹时，需要在项目的 vue.config.js 文件中添加 publicPath: './（部署目录）' 配置项，然后打包上传。 例如： publicPath: './sc'，若使用自动化部署方式则忽略即可。</p>
+          </div>
+        </div>
+        <!-- <h2>
+         脚手架
+        </h2>-->
       </div>
     </section>
   </div>
 </template>
 <script>
+import Decorate from "../header/decorate";
 export default {
-  // components: {
-  // },
-  // computed: {
-  // },
+  components: {
+    Decorate
+  },
   data() {
     return {
       user: {}, //模式

@@ -32,9 +32,20 @@
           <MenuItem name="4" to="/docs">
             <Icon type="ios-book" size="20" />说明文档
           </MenuItem>
+          <!-- <MenuItem name="5">
+            <Badge :count="2">
+              <Icon type="ios-notifications-outline" size="24"></Icon>
+            </Badge>消息
+          </MenuItem>-->
         </Menu>
       </div>
-      <Input v-model="inputVal" search placeholder="查找项目..." style="width: 200px" />
+      <Input
+        v-model="inputVal"
+        search
+        @on-search="handleOnSearch"
+        placeholder="查找项目..."
+        style="width: 200px"
+      />
       <Dropdown class="dropdown-menu">
         <div class="heade-menu">
           <img :src="$url+user.url" />
@@ -60,11 +71,11 @@ export default {
       user: {}
     };
   },
-  watch: {
-    inputVal(val) {
-      this.$event.emit("input", val);
-    }
-  },
+  // watch: {
+  //   inputVal(val) {
+
+  //   }
+  // },
   mounted() {
     this.user = this.$store.state.variable.info;
     // this.$event.on("inputClear", val => {
@@ -72,6 +83,9 @@ export default {
     // });
   },
   methods: {
+    handleOnSearch() {
+      this.$event.emit("input", this.inputVal);
+    },
     handleQuit() {
       window.sessionStorage.clear();
       this.$store.commit("setUser", {});

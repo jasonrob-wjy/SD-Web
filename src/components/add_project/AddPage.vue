@@ -1,48 +1,7 @@
 <template>
   <div>
     <header class="header__content" style="position: relative; overflow: hidden;">
-      <div class="spots">
-        <span
-          class="decorate"
-          style="background: rgb(201, 27, 0); width: 51px; height: 51px; margin-top: -25.5px; margin-left: -25.5px; top: 55.6675%; left: 5%;"
-        ></span>
-        <span
-          class="decorate"
-          style="background: rgb(23, 90, 171); width: 28px; height: 28px; margin-top: -14px; margin-left: -14px; top: 10.2246%; left: 15%;"
-        ></span>
-        <span
-          class="decorate"
-          style="background: rgb(233, 34, 36); width: 37px; height: 37px; margin-top: -18.5px; margin-left: -18.5px; top: 71.9133%; left: 25%;"
-        ></span>
-        <span
-          class="decorate"
-          style="background: rgb(0, 62, 135); width: 47px; height: 47px; margin-top: -23.5px; margin-left: -23.5px; top: 22.8839%; left: 35%;"
-        ></span>
-        <span
-          class="decorate"
-          style="background: rgb(0, 135, 231); width: 31px; height: 31px; margin-top: -15.5px; margin-left: -15.5px; top: 5.09172%; left: 45%;"
-        ></span>
-        <span
-          class="decorate"
-          style="background: rgb(23, 90, 171); width: 52px; height: 52px; margin-top: -26px; margin-left: -26px; top: 32.1525%; left: 55%;"
-        ></span>
-        <span
-          class="decorate"
-          style="background: rgb(255, 86, 0); width: 29px; height: 29px; margin-top: -14.5px; margin-left: -14.5px; top: 46.8035%; left: 65%;"
-        ></span>
-        <span
-          class="decorate"
-          style="width: 44px; height: 44px; margin-top: -22px; margin-left: -22px; top: 97.8537%; left: 75%;"
-        ></span>
-        <span
-          class="decorate"
-          style="background: rgb(201, 27, 0); width: 43px; height: 43px; margin-top: -21.5px; margin-left: -21.5px; top: 30.7088%; left: 85%;"
-        ></span>
-        <span
-          class="decorate"
-          style="width: 27px; height: 27px; margin-top: -13.5px; margin-left: -13.5px; top: 7.43497%; left: 95%;"
-        ></span>
-      </div>
+      <Decorate />
       <div class="container">
         <div class="he-row">
           <div class="header_left">
@@ -305,7 +264,7 @@
     <Modal v-model="isToLogin" width="360" @on-cancel="handleToLogin">
       <p slot="header" style="color:#f60;text-align:center">
         <Icon type="ios-information-circle"></Icon>
-        <span>权限提示</span>
+        <span>系统提示</span>
       </p>
       <div style="text-align:center">
         <p>由于您不是注册用户，暂无权执行此操作，请注册登录后操作！</p>
@@ -317,16 +276,11 @@
   </div>
 </template>
 <script>
-// import QuillEditor from "../../../public/QuillEditor";
+import Decorate from "../header/decorate";
 export default {
-  // components: {
-  // 	QuillEditor
-  // },
-  // computed: {
-  // 	oneBugIsShow() {
-  // 		return this.$store.state.show.oneBugIsShow;
-  // 	}
-  // },
+  components: {
+    Decorate
+  },
   props: ["typeArr", "classArr"],
 
   data() {
@@ -414,24 +368,13 @@ export default {
     this.url = this.usre.url;
     this.sideList = this.$store.state.variable.projectTitleArr;
 
-    // this.content = this.$store.state.variable.itemData;
-    this.projectName = this.$store.state.variable.itemData.projectName;
+    this.getMkdir();
+
+    let project = this.$store.state.variable.itemData;
+    this.projectName = project.projectName ? project.projectName : "";
     if (this.projectName) {
       this.getProjectNameData();
     }
-
-    // this.setData();
-    // let _this = this;
-    // this.$event.on("isOpenAdd", e => {
-    //   this.modeType = "0";
-    //   this.isAddClear = true;
-    //   this.handleClear();
-    //   this.projectName = this.$store.state.variable.projectName;
-    //   if (this.projectName) {
-    //     this.getProjectNameData();
-    //   }
-    // });
-    this.getMkdir();
   },
   methods: {
     handleClear() {
@@ -585,10 +528,25 @@ export default {
           });
           return;
         }
+        if (this.isUpLoader) {
+          this.$Message["error"]({
+            background: true,
+            content: "请上传部署文件！"
+          });
+          return;
+        }
+        // if (this.isEx) {
+        //   this.$Message["error"]({
+        //     background: true,
+        //     content: "部署目录已存在，请重新输入！"
+        //   });
+        //   return;
+        // }
 
         let data = {
           projectName: this.projectName,
           author: this.author,
+          authorId: this.usre.bid,
           url: this.url ? this.url : "/assets/img/dt.png",
           idDeployment: this.idDeployment,
           root: this.root,
@@ -596,7 +554,9 @@ export default {
           uid: this.uid,
           catalog: this.catalog ? this.catalog : this.dist,
           versionRoot: "./" + this.root + "/" + this.version,
-          remark: this.remark,
+          remark: this.remark
+            ? this.remark
+            : "更新" + this.projectName + "项目。",
 
           dist: this.dist ? this.dist : "dist",
           gitUrl: this.gitUrl, //git 地址
@@ -672,6 +632,13 @@ export default {
           });
           return;
         }
+        // if (this.isEx) {
+        //   this.$Message["error"]({
+        //     background: true,
+        //     content: "部署目录已存在，请重新输入！"
+        //   });
+        //   return;
+        // }
         this.zzcAutoSubmit = true;
         let data = {
           gitUrl: this.gitUrl, //git 地址
@@ -710,7 +677,7 @@ export default {
     handleInit(data) {
       this.$Message.destroy();
       this.$Message.loading({
-        content: "项目正在初始化，请耐心等待...",
+        content: "请勿关闭当前界面，项目正在初始化，请耐心等待...",
         duration: 0
       });
       this.$axios
@@ -739,7 +706,7 @@ export default {
     handleBuild(data) {
       this.$Message.destroy();
       this.$Message.loading({
-        content: "项目打包中，请耐心等待...",
+        content: "请勿关闭当前界面，项目打包中，请耐心等待...",
         duration: 0
       });
       this.$axios
@@ -751,6 +718,7 @@ export default {
               background: true,
               content: "项目已打包完成！"
             });
+            this.isUpLoader = false;
             this.handleSubmit();
           } else {
             this.$Message["error"]({
@@ -765,10 +733,9 @@ export default {
         });
     },
     handleZzcAutoSubmit() {
-      this.$Message.destroy();
       this.$Message["warning"]({
         background: true,
-        content: "项目正在部署中，请耐心等待~"
+        content: "请勿关闭当前界面，项目正在部署中，请耐心等待~"
       });
     },
 
