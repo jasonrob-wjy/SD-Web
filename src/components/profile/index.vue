@@ -60,9 +60,9 @@
           <div v-if="isEmail">
             <label>邮箱地址：</label>
             <span>{{email}}</span>
-            <Button type="dashed" v-if="user.name!=='Admin'" @click="handleOnChange('yxdzxg')">
+            <!-- <Button type="dashed" v-if="user.name!=='Admin'" @click="handleOnChange('yxdzxg')">
               <Icon type="ios-create-outline" size="16" />修改
-            </Button>
+            </Button> -->
           </div>
           <div v-else>
             <label>邮箱地址：</label>
@@ -196,17 +196,17 @@ export default {
       this.$axios
         .post("/api/person/user/update", this.$qs.stringify(data))
         .then(res => {
-          this.$Message.destroy();
+          // this.$Message.destroy();
           if (res.data.result) {
-            this.$Message["success"]({
-              background: true,
-              content: "更新成功！"
-            });
+            // this.$Message["success"]({
+            //   background: true,
+            //   content: "信息更新成功！"
+            // });
             this.getUser();
           } else {
             this.$Message["error"]({
               background: true,
-              content: "更新失败！"
+              content: "信息更新失败！"
             });
           }
         })
@@ -222,14 +222,14 @@ export default {
           if (res.data.result) {
             this.$Message["success"]({
               background: true,
-              content: "用户名更新成功！"
+              content: "信息更新成功！"
             });
             this.$store.commit("setUser", res.data.data[0]);
             this.setUser();
           } else {
             this.$Message["error"]({
               background: true,
-              content: "用户名更新失败！"
+              content: "信息更新失败！"
             });
           }
         })

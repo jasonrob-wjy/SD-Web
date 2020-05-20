@@ -1,97 +1,124 @@
 <template>
   <div class="login">
-    <div class="logo">Web Deploy</div>
-    <div class="warp">
-      <h2 v-if="!loginVal">用户登录</h2>
-      <h2 v-else>用户注册</h2>
-      <div>
-        <div class="in-box">
-          <span>用户名</span>
-          <input type="text" v-model="userName" />
-          <Icon type="md-person" />
+    <div class="logo"><img src="../../assets/logo15.png"/></div>
+    <div class="warp" :class="[loginVal?'':'login-in']">
+      <div class="left">Web Deploy 2.0</div>
+      <div class="right">
+        <!-- <h2 v-if="!loginVal">用户登录</h2>
+        <h2 v-else>用户注册</h2>-->
+        <h1>前端自动化部署平台</h1>
+        <div class="login-top">
+          <div class="in-box">
+            <!-- <span>用户名</span> -->
+            <input type="text" v-model="userName" placeholder="请输入用户名..." />
+            <Icon type="md-person" />
+          </div>
+          <label class="error" v-if="isuserName">
+            <span>
+              <Icon type="md-information-circle" />请填写正确的手机动态码！
+            </span>
+          </label>
         </div>
-        <label class="error" v-if="isuserName">
-          <span>
-            <Icon type="md-information-circle" />请填写正确的手机动态码！
-          </span>
-        </label>
-      </div>
-      <div>
-        <div class="in-box">
-          <span>密码</span>
-          <input type="password" v-model="userPass" />
-          <Icon type="ios-unlock" />
+        <div v-if="rEmail">
+          <div class="in-box">
+            <!-- <span>密码</span> -->
+            <input type="password" v-model="userPass" placeholder="请输入密码..." />
+            <Icon type="ios-unlock" />
+          </div>
+          <!-- <label class="error" v-if="isuserPass">
+            <span>
+              <Icon type="md-information-circle" />请填写正确的手机动态码！
+            </span>
+          </label>-->
         </div>
-        <label class="error" v-if="isuserPass">
-          <span>
-            <Icon type="md-information-circle" />请填写正确的手机动态码！
-          </span>
-        </label>
-      </div>
-      <div v-if="loginVal">
-        <div class="in-box">
-          <span>确认密码</span>
-          <input type="password" v-model="userPass1" />
-          <Icon type="ios-unlock" />
+        <div v-if="loginVal">
+          <div class="in-box">
+            <!-- <span>确认密码</span> -->
+            <input type="password" v-model="userPass1" placeholder="请输入确认密码..." />
+            <Icon type="ios-unlock" />
+          </div>
+          <label class="error" v-if="(userPass1!=userPass)&&userPass1">
+            <span>
+              <Icon type="md-information-circle" />确认密码与密码不一致，请重新输入！
+            </span>
+          </label>
         </div>
-        <label class="error" v-if="(userPass1!=userPass)&&userPass1">
-          <span>
-            <Icon type="md-information-circle" />确认密码与密码不一致，请重新输入！
-          </span>
-        </label>
-      </div>
-      <div v-if="loginVal">
-        <div class="in-box">
-          <span>邮箱</span>
-          <input type="text" v-model="email" style="padding-right:60px;" />
-          <Icon type="ios-mail" />
-          <div class="getemail">
-            <span @click="sendCode" v-if="isSendCode">获取验证码</span>
-            <span v-else>重新获取（{{count}}）</span>
+        <!-- 注册邮箱 -->
+        <div v-if="loginVal">
+          <div class="in-box">
+            <input type="text" v-model="email" style="padding-right:60px;" placeholder="请输入您的邮箱..." />
+            <Icon type="ios-mail" />
+            <div class="getemail">
+              <span @click="sendCode" v-if="isSendCode">获取验证码</span>
+              <span v-else>重新获取（{{count}}）</span>
+            </div>
           </div>
         </div>
-        <label class="error" v-if="isuserPass">
-          <span>
-            <Icon type="md-information-circle" />请填写正确的手机动态码！
-          </span>
-        </label>
-      </div>
-      <div v-if="loginVal">
-        <div class="in-box">
-          <span>验证码</span>
-          <input type="text" v-model="code" />
-          <Icon type="ios-unlock" />
+        <!-- 重置邮箱 -->
+        <div v-if="!rEmail">
+          <div class="in-box">
+            <input
+              type="text"
+              v-model="emailVal"
+              style="padding-right:60px;"
+              placeholder="请输入邮箱..."
+            />
+            <Icon type="ios-mail" />
+          </div>
         </div>
-        <label class="error" v-if="isuserPass">
-          <span>
-            <Icon type="md-information-circle" />请填写正确的手机动态码！
-          </span>
-        </label>
-      </div>
-      <!-- 注册 -->
-      <div v-if="loginVal">
-        <p>
-          <span></span>
-          <span>
-            已有账号？
-            <a href="javascript:void(0);" @click="handleLoginVal">去登录</a>
-          </span>
-        </p>
-        <div class="button" @click="handleLogin">
-          <span>注册</span>
+        <div v-if="loginVal">
+          <div class="in-box">
+            <!-- <span>验证码</span> -->
+            <input type="text" v-model="code" placeholder="请输入验证码..." />
+            <Icon type="ios-unlock" />
+          </div>
+          <label class="error" v-if="isuserPass">
+            <span>
+              <Icon type="md-information-circle" />验证码错误！
+            </span>
+          </label>
         </div>
-      </div>
-      <!-- 登录 -->
-      <div v-else>
-        <p>
-          <span>
-            还没账号？
-            <a href="javascript:void(0);" @click="handleLoginVal">去注册</a>
-          </span>
-          <span>忘记密码？</span>
-        </p>
-        <div class="button" @click="handleSubmit">
-          <span>登录</span>
+        <!-- 注册 -->
+        <div v-if="loginVal">
+          <p>
+            <span></span>
+            <span>
+              已有账号？
+              <a href="javascript:void(0);" @click="handleLoginVal">去登录</a>
+            </span>
+          </p>
+          <div class="button" @click="handleLogin">
+            <span>注册</span>
+          </div>
+        </div>
+        <!-- 登录 -->
+        <div v-else>
+          <div v-if="rEmail">
+            <p class="wjmm">
+              <span>
+                还没账号？
+                <a href="javascript:void(0);" @click="handleLoginVal">去注册</a>
+              </span>
+              <span>
+                <a href="javascript:void(0);" @click="resetMailbox">忘记密码？</a>
+              </span>
+            </p>
+            <div class="button" @click="handleSubmit">
+              <span>登录</span>
+            </div>
+          </div>
+          <!-- 重置密码 -->
+          <div v-else>
+            <p class="wjmm">
+              <span>
+                已有账号？
+                <a href="javascript:void(0);" @click="resetMailbox">去登录</a>
+              </span>
+            </p>
+            <div class="button" @click="setResetMailbox">
+              <span style="letter-spacing:1px;">重置密码</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -119,15 +146,17 @@ export default {
   name: "login",
   data: () => ({
     isuserPass: false,
-    userPass: "123456",
+    userPass: "",
     isuserName: false,
-    userName: "Admin",
+    userName: "",
     code: "",
     email: "",
+    emailVal: "",
     userPass1: "",
     isSendCode: true,
     count: 59,
-    loginVal: false
+    loginVal: false,
+    rEmail: true
   }),
   props: {
     msg: String
@@ -153,6 +182,10 @@ export default {
       this.email = "";
       this.isSendCode = true;
       this.loginVal = false;
+      this.rEmail = true;
+    },
+    resetMailbox() {
+      this.rEmail = !this.rEmail;
     },
     //发送验证码
     sendCode() {
@@ -166,6 +199,13 @@ export default {
         this.$Message["error"]({
           background: true,
           content: "请输入邮箱地址！"
+        });
+        return;
+      }
+      if (!this.checkEmail(this.email)) {
+        this.$Message["error"]({
+          background: true,
+          content: "请正确输入邮箱地址！"
         });
         return;
       }
@@ -205,7 +245,10 @@ export default {
           console.log(error);
         });
     },
-
+    checkEmail(val) {
+      let reg = new RegExp(/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/);
+      return reg.test(val);
+    },
     // 登录
     handleSubmit(val) {
       this.$Message.destroy();
@@ -247,7 +290,7 @@ export default {
             window.sessionStorage.setItem("state", false);
             this.$Message["error"]({
               background: true,
-              content: "登录失败！"
+              content: "登录失败，请重新登录！"
             });
           }
         })
@@ -293,6 +336,13 @@ export default {
         });
         return;
       }
+      if (!this.checkEmail(this.email)) {
+        this.$Message["error"]({
+          background: true,
+          content: "请正确输入邮箱地址！"
+        });
+        return;
+      }
       if (!this.code) {
         this.$Message["error"]({
           background: true,
@@ -324,7 +374,7 @@ export default {
             } else if (res.data.mark) {
               this.$Message["error"]({
                 background: true,
-                content: "你已经注册，请直接登录！"
+                content: "您已注册，请直接登录！"
               });
               this.handleClear();
               this.loginVal = false;
@@ -334,6 +384,53 @@ export default {
                 content: "注册失败！"
               });
             }
+          }
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    },
+    setResetMailbox() {
+        this.$Message.destroy();
+       if (!this.userName) {
+        this.$Message["error"]({
+          background: true,
+          content: "请输入用户名！"
+        });
+        return;
+      }
+      if (!this.emailVal) {
+        this.$Message["error"]({
+          background: true,
+          content: "请输入邮箱地址！"
+        });
+        return;
+      }
+       if (!this.checkEmail(this.emailVal)) {
+        this.$Message["error"]({
+          background: true,
+          content: "请正确输入邮箱地址！"
+        });
+        return;
+      }
+      let data = {
+        name: this.userName,
+        email: this.emailVal
+      };
+      this.$axios
+        .post("/api/person/user/reset", this.$qs.stringify(data))
+        .then(res => {
+          if (res.data.result) {
+            this.$Message["success"]({
+              background: true,
+              content: "密码已发至您的邮箱，请注意查收！"
+            });
+            this.resetMailbox();
+          } else {
+            this.$Message["error"]({
+              background: true,
+              content: "用户名或邮箱错误，请重新输入！"
+            });
           }
         })
         .catch(function(error) {

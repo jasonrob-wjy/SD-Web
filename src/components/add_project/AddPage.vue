@@ -371,7 +371,7 @@ export default {
     this.getMkdir();
 
     let project = this.$store.state.variable.itemData;
-    this.projectName = project.projectName ? project.projectName : "";
+    this.projectName = project ? project.projectName : "";
     if (this.projectName) {
       this.getProjectNameData();
     }

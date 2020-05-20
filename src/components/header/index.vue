@@ -2,7 +2,8 @@
   <div class="header">
     <div>
       <div class="he-left">
-        <h1>Web Deploy</h1>
+        <!-- <h1>Web Deploy</h1> -->
+        <h1></h1>
         <Menu mode="horizontal" :theme="theme" active-name="1">
           <!-- <Input v-model="value14" placeholder="Enter something..." clearable style="width: 100px" /> -->
           <MenuItem name="1" to="/">
