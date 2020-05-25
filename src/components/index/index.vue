@@ -20,7 +20,7 @@
             <RadioGroup v-model="qurey" type="button" @on-change="handleOnChange">
               <Radio label="全部"></Radio>
               <Radio label="我创建的"></Radio>
-              <Radio label="我收藏的"></Radio>
+              <Radio label="已收藏的"></Radio>
             </RadioGroup>
           </div>
         </div>
@@ -35,12 +35,12 @@
                 <Icon
                   type="ios-star-outline"
                   size="26"
-                  v-if="item.collect=='0'"
+                  v-if="item.collect!=='1'"
                   @click="handleStar(item.bid,'1')"
                 />
                 <Icon type="ios-star" size="26" v-else @click="handleStar(item.bid,'0')" />
               </div>
-              <h2 @click="handleRouter('/addpage',item.projectName,item)">{{item.projectName}}</h2>
+              <h2 @click="handleHref($url + item.webUrl)">{{item.projectName}}</h2>
               <p>
                 <Icon type="ios-code-working" size="20" />
                 <span>{{item.version}}</span>
@@ -55,14 +55,6 @@
               </p>
               <div class="description">{{item.remark}}</div>
               <div class="bottom-list">
-                <Tooltip
-                  content="访问"
-                  placement="top"
-                  class="border-r-no"
-                  @click.native="handleHref($url + item.webUrl)"
-                >
-                  <Icon type="md-open" size="20" />
-                </Tooltip>
                 <Tooltip
                   content="复制链接"
                   placement="top"
@@ -84,9 +76,17 @@
                 <Tooltip
                   content="项目列表"
                   placement="top"
+                  class="border-r-no"
                   @click.native="handleRouter('/tablePage',item.projectName)"
                 >
                   <Icon type="ios-list-box-outline" size="20" />
+                </Tooltip>
+                <Tooltip
+                  content="更新项目"
+                  placement="top"
+                  @click.native="handleRouter('/addpage',item.projectName,item)"
+                >
+                  <Icon type="md-add" size="20" />
                 </Tooltip>
               </div>
             </li>
@@ -95,8 +95,11 @@
 
         <!-- 无数据时展示的内容 -->
         <div class="placeholder" v-show="!projectData.length">
-          <i class="ivu-icon ivu-icon-happy-outline"></i>
-          <p>暂无内容哦，快去创建项目吧！</p>
+          <p>ヾ(^∀^)ﾉ</p>
+          <p>
+            暂无内容哦，快去
+            <router-link to="/addpage">创建项目</router-link>吧！
+          </p>
         </div>
         <!-- 右下角添加按钮 -->
         <div class="em-add" @click="handleRouter('/addpage')">
@@ -164,7 +167,7 @@ export default {
 
   data: () => ({
     projectData: [],
-    qurey: "全部",
+    qurey: "我创建的",
     authorId: "",
     collect: "",
     projectName: "",
@@ -178,6 +181,7 @@ export default {
   mounted() {
     this.$Message.destroy();
     this.user = this.$store.state.variable.info;
+    this.authorId = this.user.bid;
     this.handleGetData();
     this.$event.on("input", val => {
       this.projectName = val;
@@ -230,7 +234,7 @@ export default {
         case "我创建的":
           this.authorId = this.user.bid;
           break;
-        case "我收藏的":
+        case "已收藏的":
           this.collect = "1";
           // this.authorId = this.user.bid;
           break;
@@ -307,19 +311,19 @@ export default {
         });
     },
     handleDelete(projectName) {
-      if (this.user.name === "Admin") {
-        this.isToLogin = true;
-      } else {
-        this.isDelete = true;
-        this.projectName = projectName;
-      }
+      // if (this.user.name === "Admin") {
+      //   this.isToLogin = true;
+      // } else {
+      this.isDelete = true;
+      this.projectName = projectName;
+      // }
     },
     handleRouter(path, val, data) {
-      this.$store.commit("setItemData", data);
+      // this.$store.commit("setItemData", data);
       this.$router.push({ path, query: { title: val } });
     },
     handleHref(url) {
-      window.open(url);
+      window.open(url + "/index.html");
     },
     onCopy() {
       this.$Message.destroy();

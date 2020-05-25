@@ -172,19 +172,31 @@
             </div>
           </transition>
           <div class="banben">
-            <div>
+            <!-- <div>
               <label>立即部署：</label>
               <RadioGroup v-model="idDeployment">
                 <Radio label="yes">是</Radio>
                 <Radio label="no">否</Radio>
               </RadioGroup>
+            </div>-->
+            <div>
+              <label>部署方式：</label>
+              <span v-if="modeType==='1'">自动部署</span>
+              <span v-else>静态部署</span>
+              <Tooltip
+                max-width="200"
+                :content="modeType==='1'?'此次部署之后，只要提交代码到 GitLab 仓库即可自动化部署。':'只需上传静态资源即可。'"
+                placement="right"
+              >
+                <Icon type="ios-help-circle-outline tip" size="22" />
+              </Tooltip>
             </div>
             <div>
               <label>部署版本：</label>
-              <span>{{version}}</span>
+              <span>v{{version}}</span>
             </div>
           </div>
-          <div class="banben" v-if="modeType==='1'">
+          <!-- <div class="banben">
             <div style="width:165px">
               <label>部署方式：</label>
               <span>自动部署</span>
@@ -192,7 +204,7 @@
             <Tooltip max-width="200" content="此次部署之后，只要提交代码到 GitLab 仓库即可自动化部署。" placement="right">
               <Icon type="ios-help-circle-outline tip" size="22" />
             </Tooltip>
-          </div>
+          </div>-->
           <div>
             <label>部署摘要：</label>
             <Input
@@ -302,7 +314,7 @@ export default {
         target: this.$url + "/api/deploy/files/add", //SpringBoot后台接收文件夹数据的接口
         query: {
           root: "",
-          version: ""
+          version: "1.0.1"
         },
         testChunks: false, //是否分片-不分片
         fileParameterName: "file" //上传文件时文件的参数名，默认file
@@ -370,10 +382,14 @@ export default {
 
     this.getMkdir();
 
-    let project = this.$store.state.variable.itemData;
-    this.projectName = project ? project.projectName : "";
+    let project = this.$router.currentRoute.query;
+
+    this.projectName = project.title;
     if (this.projectName) {
       this.getProjectNameData();
+    } else {
+      this.handleClear();
+      this.isAddClear = false;
     }
   },
   methods: {
@@ -410,6 +426,7 @@ export default {
       this.$Message.destroy();
       let data = {
         projectName: this.projectName,
+        accurate: 1, //精确匹配
         select: "one"
       };
       if (this.modeType == "1") {
@@ -509,9 +526,9 @@ export default {
 
     // 静态部署
     handleSubmit() {
-      if (this.usre.name === "Admin") {
-        this.isToLogin = true;
-      } else {
+      // if (this.usre.name === "Admin") {
+      //   this.isToLogin = true;
+      // } else {
         this.$Message.destroy();
         // 判断输入内容是否为空
         if (!this.projectName) {
@@ -542,16 +559,17 @@ export default {
         //   });
         //   return;
         // }
-
+        // let project = this.$store.state.variable.itemData;
         let data = {
           projectName: this.projectName,
           author: this.author,
           authorId: this.usre.bid,
           url: this.url ? this.url : "/assets/img/dt.png",
-          idDeployment: this.idDeployment,
+          // idDeployment: this.idDeployment,
           root: this.root,
           version: this.version,
           uid: this.uid,
+          // isNew: this.projectName === project.projectName,
           catalog: this.catalog ? this.catalog : this.dist,
           versionRoot: "./" + this.root + "/" + this.version,
           remark: this.remark
@@ -590,17 +608,22 @@ export default {
               this.zzcAutoSubmit = false;
             }
           })
-          .catch(function(error) {
+          .catch(error => {
+            this.$Message.destroy();
+            this.$Message["error"]({
+              background: true,
+              content: "部署路径出现问题，部署失败！"
+            });
             console.log(error);
           });
-      }
+      // }
     },
 
     //拉取项目(自动部署)
     handleAutoSubmit() {
-      if (this.usre.name === "Admin") {
-        this.isToLogin = true;
-      } else {
+      // if (this.usre.name === "Admin") {
+      //   this.isToLogin = true;
+      // } else {
         this.$Message.destroy();
 
         // 判断输入内容是否为空
@@ -671,7 +694,7 @@ export default {
           .catch(function(error) {
             console.log(error);
           });
-      }
+      // }
     },
     //初始化项目 安装依赖
     handleInit(data) {

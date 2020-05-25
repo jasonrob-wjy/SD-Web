@@ -1,6 +1,8 @@
 <template>
   <div class="login">
-    <div class="logo"><img src="../../assets/logo15.png"/></div>
+    <div class="logo">
+      <img src="../../assets/logo15.png" />
+    </div>
     <div class="warp" :class="[loginVal?'':'login-in']">
       <div class="left">Web Deploy 2.0</div>
       <div class="right">
@@ -89,6 +91,7 @@
           </p>
           <div class="button" @click="handleLogin">
             <span>注册</span>
+            <Icon type="ios-loading" size="18" class="demo-spin-icon-load" v-if="loading"></Icon>
           </div>
         </div>
         <!-- 登录 -->
@@ -105,6 +108,7 @@
             </p>
             <div class="button" @click="handleSubmit">
               <span>登录</span>
+              <Icon type="ios-loading" size="18" class="demo-spin-icon-load" v-if="loading"></Icon>
             </div>
           </div>
           <!-- 重置密码 -->
@@ -117,7 +121,21 @@
             </p>
             <div class="button" @click="setResetMailbox">
               <span style="letter-spacing:1px;">重置密码</span>
+              <Icon type="ios-loading" size="18" class="demo-spin-icon-load" v-if="loading"></Icon>
             </div>
+          </div>
+          <div class="login-oauth">
+            <div class="oauth-title">
+              <span>其他方式登录</span>
+            </div>
+            <ul>
+              <li @click="giteeClick">
+                <img src="../../assets/gitee.png" />
+              </li>
+              <li @click="githubClick">
+                <i class="fa fa-github"></i>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
@@ -145,6 +163,7 @@
 export default {
   name: "login",
   data: () => ({
+    loading: false,
     isuserPass: false,
     userPass: "",
     isuserName: false,
@@ -167,7 +186,69 @@ export default {
       }
     }
   },
-  created() {},
+  created() {
+    // 获取url里面的code
+    var code = this.getUrlData("code") || "";
+    if (code) {
+      this.$Message.loading({
+        content: "登录中，请稍后...",
+        duration: 0
+      });
+      switch (window.sessionStorage.getItem("type")) {
+        case "gitee":
+          this.$axios
+            .post("/api/person/oauth/gitee", this.$qs.stringify({ code }))
+            .then(res => {
+              this.$Message.destroy();
+              if (res.data.result) {
+                this.userName = res.data.data.name;
+                this.userPass = res.data.data.password;
+                this.handleSubmit();
+              } else {
+                this.$Message["error"]({
+                  background: true,
+                  content: "登录失败，请重新登录！"
+                });
+              }
+            })
+            .catch(function(error) {
+              this.$Message.destroy();
+              this.$Message["error"]({
+                background: true,
+                content: "登录失败，请重新登录！"
+              });
+            });
+          break;
+        case "github":
+          this.$axios
+            .post("/api/person/oauth/github", this.$qs.stringify({ code }))
+            .then(res => {
+              this.$Message.destroy();
+              if (res.data.result) {
+                this.userName = res.data.data.name;
+                this.userPass = res.data.data.password;
+                this.handleSubmit();
+              } else {
+                this.$Message["error"]({
+                  background: true,
+                  content: "登录失败，请重新登录！"
+                });
+              }
+            })
+            .catch(function(error) {
+              this.$Message.destroy();
+              this.$Message["error"]({
+                background: true,
+                content: "登录失败，请重新登录！"
+              });
+            });
+          break;
+
+        default:
+          break;
+      }
+    }
+  },
   mounted() {
     // this.getBidData();
   },
@@ -250,7 +331,7 @@ export default {
       return reg.test(val);
     },
     // 登录
-    handleSubmit(val) {
+    handleSubmit() {
       this.$Message.destroy();
       let data = {
         name: this.userName,
@@ -278,12 +359,18 @@ export default {
         });
         return;
       }
+      this.loading = true;
       this.$axios
         .post("/api/person/user/login", this.$qs.stringify(data))
         .then(res => {
+          this.loading = false;
           if (res.data.result) {
+            window.sessionStorage.clear();
             window.sessionStorage.setItem("state", "true");
-            this.$store.commit("setUser", res.data.content);
+            let user = res.data.content;
+            user.url =
+              user.url.indexOf("http") > -1 ? user.url : this.$url + user.url;
+            this.$store.commit("setUser", user);
             this.handleClear();
             this.$router.push({ path: "/" });
           } else {
@@ -350,14 +437,16 @@ export default {
         });
         return;
       }
-      this.$Message.loading({
-        content: "注册中，请稍后...",
-        duration: 0
-      });
+      // this.$Message.loading({
+      //   content: "注册中，请稍后...",
+      //   duration: 0
+      // });
+      this.loading = true;
       this.$axios
         .post("/api/person/user", this.$qs.stringify(data))
         .then(res => {
           this.$Message.destroy();
+          this.loading = false;
           if (res.data.result) {
             this.handleClear();
             this.$Message["success"]({
@@ -391,8 +480,8 @@ export default {
         });
     },
     setResetMailbox() {
-        this.$Message.destroy();
-       if (!this.userName) {
+      this.$Message.destroy();
+      if (!this.userName) {
         this.$Message["error"]({
           background: true,
           content: "请输入用户名！"
@@ -406,7 +495,7 @@ export default {
         });
         return;
       }
-       if (!this.checkEmail(this.emailVal)) {
+      if (!this.checkEmail(this.emailVal)) {
         this.$Message["error"]({
           background: true,
           content: "请正确输入邮箱地址！"
@@ -417,9 +506,11 @@ export default {
         name: this.userName,
         email: this.emailVal
       };
+      this.loading = true;
       this.$axios
         .post("/api/person/user/reset", this.$qs.stringify(data))
         .then(res => {
+          this.loading = false;
           if (res.data.result) {
             this.$Message["success"]({
               background: true,
@@ -444,6 +535,37 @@ export default {
       let re = /.*[\u4e00-\u9fa5]+.*$/;
       if (re.test(temp)) return false;
       return true;
+    },
+
+    // 第三方GitHub登录 github登录点击事件
+    githubClick() {
+      this.$Message.destroy();
+      this.$Message.loading({
+        content: "授权中，请稍后...",
+        duration: 0
+      });
+      window.sessionStorage.setItem("type", "github");
+      // window.location.href = `https://github.com/login/oauth/authorize?client_id=8b089dc0bdefbbfc7d95&redirect_uri=${window
+      window.location.href = `https://github.com/login/oauth/authorize?client_id=597827f3b2327150f3d7&redirect_uri=${window
+        .location.origin + window.location.pathname}`;
+    },
+    // 第三方Gitee登录 gitee登录点击事件
+    giteeClick() {
+      this.$Message.destroy();
+      this.$Message.loading({
+        content: "授权中，请稍后...",
+        duration: 0
+      });
+      window.sessionStorage.setItem("type", "gitee");
+      // window.location.href = `https://gitee.com/oauth/authorize?client_id=f8747cff265598b49d5490eec1b922e362c99a332e2ba5592124af3a98884464&redirect_uri=${window
+      window.location.href = `https://gitee.com/oauth/authorize?client_id=e4762d9e0e22e30c129ba61b235a1bfafcefbb5b58e46e2301c15ae6c514e0be&redirect_uri=${window
+        .location.origin + window.location.pathname}&response_type=code`;
+    },
+    getUrlData(name) {
+      var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+      var r = window.location.search.substr(1).match(reg);
+      if (r != null) return unescape(r[2]);
+      return null;
     }
   }
 };

@@ -15,49 +15,19 @@
               </span>
             </div>
           </div>
-
-          <!-- <div class="header__control">
-            <RadioGroup v-model="theme" type="button">
-              <Radio label="全部"></Radio>
-              <Radio label="我创建的"></Radio>
-              <Radio label="我加入的"></Radio>
-            </RadioGroup>
-          </div>-->
         </div>
       </div>
     </header>
     <section>
       <div>
-        <!-- <div class="query">
-      <div class="select">
-        <label>创建者</label>
-        <Select v-model="authorVal" clearable @on-change="handleQuery" style="width:90px">
-          <Option v-for="item in cityList1" :value="item.name" :key="item.name">{{ item.name }}</Option>
-        </Select>
-        <label>状态</label>
-        <Select v-model="publishVal" clearable @on-change="handleQuery" style="width:90px">
-          <Option v-for="(item,i) in cityList2" :value="item.value" :key="i+'s'">{{ item.name }}</Option>
-        </Select>
-      </div>
-      <div class="search-mar">
-        <Input
-          v-model="titleVal"
-          search
-          enter-button
-          @on-search="handleQuery"
-          placeholder="请输入版本号..."
-        />
-        <Button type="success" ghost @click.stop="setIsShow">+ 新建部署</Button>
-      </div>
-        </div>-->
         <div>
           <div class="content">
             <Table border :columns="columns" :data="content">
               <template slot-scope="{ row }" slot="author">
-               <div class="author">
-                  <img :src="$url+row.url" :alt="row.author">
-               <span>{{row.author}}</span>
-               </div>
+                <div class="author">
+                  <img :src="$url+row.url" :alt="row.author" />
+                  <span>{{row.author}}</span>
+                </div>
               </template>
               <template slot-scope="{ row }" slot="projectName">
                 <Tooltip max-width="200" :content="row.projectName" placement="top">
@@ -85,7 +55,6 @@
                   v-clipboard:error="onError"
                 >复制链接</span>
                 <span v-else class="copy2">复制链接</span>
-                <!-- <a :href="$url + row.webUrl" target="_blank">{{  }}</a> -->
               </template>
               <template slot-scope="{ row }" slot="mode">
                 <span>{{row.mode!='1'?'静态部署':'自动部署'}}</span>
@@ -114,33 +83,9 @@
               @on-page-size-change="changeSizePage"
             />
           </div>
-          <!-- <div class="load-more" @click="handleMore" v-if="mark">
-				<p>
-					<Icon type="ios-arrow-dropdown" size="18"/>
-					<span>加载更多</span>
-					<Icon type="ios-arrow-dropdown" size="18"/>
-				</p>
-			</div>
-			<div v-else class="load-more">
-				<p>
-					<span>没有更多啦！</span>
-				</p>
-          </div>-->
         </div>
-        <!-- 加载动画 -->
-        <!-- <div v-else class="web-box demo-spin-col">
-			<i class="fa fa-spinner fa-pulse"></i>
-        </div>-->
-        <!-- 新建静态部署 -->
-        <!-- <AddComponent
-      v-if="isOpen"
-      :typeArr="typeArr"
-      :classArr="cityList3"
-      ref="addChart"
-      @on-change="setIsShow"
-        />-->
       </div>
-      <Modal v-model="isToLogin" width="360" @on-cancel="handleToLogin">
+      <!-- <Modal v-model="isToLogin" width="360" @on-cancel="handleToLogin">
         <p slot="header" style="color:#f60;text-align:center">
           <Icon type="ios-information-circle"></Icon>
           <span>系统提示</span>
@@ -151,7 +96,7 @@
         <div slot="footer">
           <Button type="info" size="large" long @click="handleLoginModal">我要去注册</Button>
         </div>
-      </Modal>
+      </Modal>-->
     </section>
   </div>
 </template>
@@ -177,13 +122,13 @@ export default {
         width: 180,
         slot: "projectName"
       },
-     
+
       {
         title: "创建者",
         width: 160,
         slot: "author"
       },
-       {
+      {
         title: "版本号",
         width: 100,
         slot: "version"
@@ -274,6 +219,7 @@ export default {
       let data = {
         pageNo: this.pageNo,
         pageSize: this.pageSize,
+        accurate: 1, //精确匹配
         projectName: this.$route.query.title
       };
       this.$axios
@@ -282,7 +228,7 @@ export default {
           if (res.data.result) {
             this.content = res.data.list;
 
-            //        this.content = data.content;
+            // this.content = data.content;
             // this.itemData = data.content.filter(item => {
             //   return item.idDeployment == "yes";
             // });
@@ -301,53 +247,54 @@ export default {
     //部署站点
     handleDeploy(e) {
       // 用户权限控制
-      if (this.user.name !== "Admin") {
-        let uidArr = [];
-        this.content.forEach(item => {
-          if (item.idDeployment === "yes") {
-            uidArr.push(item.bid);
-          }
-        });
-        this.$Message.destroy();
-        this.$Message.loading({
-          content: "项目部署中，请稍后...",
-          duration: 0
-        });
-        let data = {
-          root: e.root,
-          version: e.version,
-          catalog: e.catalog,
-          bid: e.bid,
-          uidArr: JSON.stringify(uidArr)
-        };
-        this.$axios
-          .post("/api/deploy/edition/transfer", this.$qs.stringify(data))
-          .then(res => {
-            this.$Message.destroy();
-            if (res.data.result) {
-              this.$Message["success"]({
-                background: true,
-                content: "项目部署成功！"
-              });
-              // this.$emit("on-reset", {});
-              this.handleGetData();
-            } else {
-              this.$Message["error"]({
-                background: true,
-                content: "项目部署失败！"
-              });
-            }
-          })
-          .catch(function(error) {
-            this.$Message.destroy();
+      // if (this.user.name !== "Admin") {
+      // let uidArr = [];
+      // this.content.forEach(item => {
+      //   if (item.idDeployment === "yes") {
+      //     uidArr.push(item.bid);
+      //   }
+      // });
+      this.$Message.destroy();
+      this.$Message.loading({
+        content: "项目部署中，请稍后...",
+        duration: 0
+      });
+      let data = {
+        root: e.root,
+        version: e.version,
+        catalog: e.catalog,
+        bid: e.bid,
+        projectName: e.projectName,
+        // uidArr: JSON.stringify(uidArr)
+      };
+      this.$axios
+        .post("/api/deploy/edition/transfer", this.$qs.stringify(data))
+        .then(res => {
+          this.$Message.destroy();
+          if (res.data.result) {
+            this.$Message["success"]({
+              background: true,
+              content: "项目部署成功！"
+            });
+            // this.$emit("on-reset", {});
+            this.handleGetData();
+          } else {
             this.$Message["error"]({
               background: true,
               content: "项目部署失败！"
             });
+          }
+        })
+        .catch(function(error) {
+          this.$Message.destroy();
+          this.$Message["error"]({
+            background: true,
+            content: "项目部署失败！"
           });
-      } else {
-        this.isToLogin = true;
-      }
+        });
+      // } else {
+      //   this.isToLogin = true;
+      // }
     },
     changePage(event) {
       this.pageNo = event;
@@ -374,8 +321,8 @@ export default {
       this.total = data.total;
     },
     // 访问站点
-    handleShow(e) {
-      window.open(this.$url + e.webUrl);
+    handleShow(e) {  
+      window.open(this.$url + e.webUrl+'/index.html');
     },
 
     onChange() {},

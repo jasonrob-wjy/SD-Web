@@ -49,7 +49,7 @@
       />
       <Dropdown class="dropdown-menu">
         <div class="heade-menu">
-          <img :src="$url+user.url" />
+          <img :src="user.url" />
           <span>{{user.name}}</span>
           <Icon type="ios-arrow-down"></Icon>
         </div>
@@ -90,6 +90,7 @@ export default {
     handleQuit() {
       window.sessionStorage.clear();
       this.$store.commit("setUser", {});
+      this.$store.commit("setItemData", {});
       this.$router.push({ path: "/login" });
     }
   }

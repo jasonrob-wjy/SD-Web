@@ -1,7 +1,7 @@
 <template>
   <div>
     <header class="header__content" style="position: relative; overflow: hidden;">
-      <Decorate/>
+      <Decorate />
       <div class="container">
         <div class="he-row">
           <div class="header_left">
@@ -25,7 +25,7 @@
           <div v-if="isName">
             <label>用户名：</label>
             <span>{{name}}</span>
-            <Button type="dashed" v-if="user.name!=='Admin'"  @click="handleOnChange('yhmxg')">
+            <Button type="dashed" v-if="user.name!=='Admin'" @click="handleOnChange('yhmxg')">
               <Icon type="ios-create-outline" size="16" />修改
             </Button>
           </div>
@@ -39,7 +39,7 @@
           <div v-if="isPassword">
             <label>用户密码：</label>
             <span>******</span>
-            <Button type="dashed" v-if="user.name!=='Admin'"  @click="handleOnChange('qrmmxg')">
+            <Button type="dashed" v-if="user.name!=='Admin'" @click="handleOnChange('qrmmxg')">
               <Icon type="ios-create-outline" size="16" />修改
             </Button>
           </div>
@@ -62,7 +62,7 @@
             <span>{{email}}</span>
             <!-- <Button type="dashed" v-if="user.name!=='Admin'" @click="handleOnChange('yxdzxg')">
               <Icon type="ios-create-outline" size="16" />修改
-            </Button> -->
+            </Button>-->
           </div>
           <div v-else>
             <label>邮箱地址：</label>
@@ -77,8 +77,12 @@
         </div>
         <div class="tx-box">
           <img :src="urlImg" />
-          <Upload :action="$url+'/api/person/img'" :on-success="handleFileSuccess" :show-upload-list="false">
-            <Button icon="ios-cloud-upload-outline" v-if="user.name!=='Admin'" >上传新头像</Button>
+          <Upload
+            :action="$url+'/api/person/img'"
+            :on-success="handleFileSuccess"
+            :show-upload-list="false"
+          >
+            <Button icon="ios-cloud-upload-outline" v-if="user.name!=='Admin'">上传新头像</Button>
           </Upload>
         </div>
       </div>
@@ -131,7 +135,7 @@ export default {
       this.name = this.user.name;
       this.bid = this.user.bid;
       this.email = this.user.email;
-      this.urlImg = this.$url + this.user.url;
+      this.urlImg = this.user.url;
       //   this.url = this.user.url;
       this.date = this.user.date;
     },
@@ -224,7 +228,10 @@ export default {
               background: true,
               content: "信息更新成功！"
             });
-            this.$store.commit("setUser", res.data.data[0]);
+            let user = res.data.data[0];
+            user.url =
+              user.url.indexOf("http") > -1 ? user.url : this.$url + user.url;
+            this.$store.commit("setUser", user);
             this.setUser();
           } else {
             this.$Message["error"]({
