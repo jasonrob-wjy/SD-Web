@@ -69,7 +69,8 @@
                   content="删除"
                   placement="top"
                   class="border-r-no"
-                  @click.native="handleDelete(item.projectName)"
+                  @click.native="handleDelete(item)"
+                  v-if="user.bid==item.authorId"
                 >
                   <Icon type="ios-trash" size="20" />
                 </Tooltip>
@@ -110,7 +111,7 @@
         <Modal v-model="isDelete" width="360" @on-cancel="handleCancel">
           <p slot="header" style="color:#f60;text-align:center">
             <Icon type="ios-information-circle"></Icon>
-            <span>删除确认</span>
+            <span>系统提示</span>
           </p>
           <div style="text-align:center">
             <p>
@@ -137,7 +138,7 @@
           </div>
         </Modal>
         <!-- 权限控制 -->
-        <Modal v-model="isToLogin" width="360" @on-cancel="handleToLogin">
+        <!-- <Modal v-model="isToLogin" width="360" @on-cancel="handleToLogin">
           <p slot="header" style="color:#f60;text-align:center">
             <Icon type="ios-information-circle"></Icon>
             <span>系统提示</span>
@@ -148,7 +149,7 @@
           <div slot="footer">
             <Button type="info" size="large" long @click="handleLoginModal">我要去注册</Button>
           </div>
-        </Modal>
+        </Modal>-->
       </div>
     </section>
   </div>
@@ -169,19 +170,25 @@ export default {
     projectData: [],
     qurey: "我创建的",
     authorId: "",
+    root: "",
     collect: "",
     projectName: "",
     projectNameInput: "",
     projectNameArr: [],
     isDelete: false,
     buttonDisabled: true,
-    isToLogin: false,
+    // isToLogin: false,
     user: {}
   }),
   mounted() {
     this.$Message.destroy();
     this.user = this.$store.state.variable.info;
     this.authorId = this.user.bid;
+    if (this.user.name === "admin") {
+      this.authorId = "";
+      this.collect = "";
+      this.qurey = "全部";
+    }
     this.handleGetData();
     this.$event.on("input", val => {
       this.projectName = val;
@@ -288,7 +295,11 @@ export default {
       this.$axios
         .post(
           "/api/deploy/edition/delete",
-          this.$qs.stringify({ projectName: this.projectNameInput })
+          this.$qs.stringify({
+            projectName: this.projectNameInput,
+            vi: "1",
+            root: this.root
+          })
         )
         .then(res => {
           if (res.data.result) {
@@ -310,12 +321,13 @@ export default {
           console.log(error);
         });
     },
-    handleDelete(projectName) {
+    handleDelete(val) {
       // if (this.user.name === "Admin") {
       //   this.isToLogin = true;
       // } else {
       this.isDelete = true;
-      this.projectName = projectName;
+      this.projectName = val.projectName;
+      this.root = val.root;
       // }
     },
     handleRouter(path, val, data) {
@@ -338,15 +350,15 @@ export default {
         background: true,
         content: "复制失败！"
       });
-    },
-    handleToLogin() {
-      this.isToLogin = false;
-    },
-    handleLoginModal() {
-      window.sessionStorage.clear();
-      this.$store.commit("setUser", {});
-      this.$router.push({ path: "/login" });
     }
+    // handleToLogin() {
+    //   this.isToLogin = false;
+    // },
+    // handleLoginModal() {
+    //   window.sessionStorage.clear();
+    //   this.$store.commit("setUser", {});
+    //   this.$router.push({ path: "/login" });
+    // }
   }
 };
 </script>

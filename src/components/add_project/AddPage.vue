@@ -219,7 +219,7 @@
             <div v-if="modeType==='1'">
               <h3>
                 <Icon type="ios-help-circle-outline" size="18" />
-                <span @click="handleHelp" :class="isHelp?'active':''">关联 GitLab 仓库</span>
+                <span @click="handleHelp" :class="isHelp?'active':''">关联 Git 仓库</span>
               </h3>
               <div class="tisi" v-if="isHelp">
                 <div>
@@ -248,13 +248,13 @@
                   <span class="code">Trigger On</span>选择
                   <span class="select">Push Events</span>
                 </div>
-                <div>
+                <!-- <div>
                   注意：另外需要在项目的
                   <span class="code">vue.config.js</span> 文件中添加
                   <span class="select">publicPath: './（部署目录）'</span> 配置项。
                   例如：
                   <span class="select">publicPath: './sc'</span>
-                </div>
+                </div>-->
               </div>
             </div>
           </div>
@@ -526,9 +526,13 @@ export default {
 
     // 静态部署
     handleSubmit() {
-      // if (this.usre.name === "Admin") {
-      //   this.isToLogin = true;
-      // } else {
+      if (this.usre.name === "admin") {
+        this.$Notice.destroy();
+        this.$Notice.error({
+          title: "系统温馨提示",
+          desc: "您不是注册用户，请注册登录后操作！"
+        });
+      } else {
         this.$Message.destroy();
         // 判断输入内容是否为空
         if (!this.projectName) {
@@ -616,14 +620,18 @@ export default {
             });
             console.log(error);
           });
-      // }
+      }
     },
 
     //拉取项目(自动部署)
     handleAutoSubmit() {
-      // if (this.usre.name === "Admin") {
-      //   this.isToLogin = true;
-      // } else {
+      if (this.usre.name === "admin") {
+        this.$Notice.destroy();
+        this.$Notice.error({
+          title: "系统温馨提示",
+          desc: "您不是注册用户，请注册登录后操作！"
+        });
+      } else {
         this.$Message.destroy();
 
         // 判断输入内容是否为空
@@ -694,7 +702,7 @@ export default {
           .catch(function(error) {
             console.log(error);
           });
-      // }
+      }
     },
     //初始化项目 安装依赖
     handleInit(data) {

@@ -60,13 +60,21 @@
                 <span>{{row.mode!='1'?'静态部署':'自动部署'}}</span>
               </template>
               <template slot-scope="{ row }" slot="action">
-                <Button
-                  v-if="row.idDeployment=='yes'"
-                  @click="handleShow(row)"
-                  type="success"
-                  size="small"
-                >访问项目</Button>
-                <Button v-else type="primary" size="small" @click="handleDeploy(row)">部署项目</Button>
+                <div class="error-bot">
+                  <Button
+                    v-if="row.idDeployment=='yes'"
+                    @click="handleShow(row)"
+                    type="success"
+                    size="small"
+                  >访问</Button>
+                  <Button v-else type="primary" size="small" @click="handleDeploy(row)">部署</Button>
+                  <Button
+                    v-if="user.bid==row.authorId"
+                    type="error"
+                    size="small"
+                    @click="handleDelecte(row)"
+                  >删除</Button>
+                </div>
               </template>
             </Table>
           </div>
@@ -85,19 +93,25 @@
           </div>
         </div>
       </div>
-      <!-- <Modal v-model="isToLogin" width="360" @on-cancel="handleToLogin">
-        <p slot="header" style="color:#f60;text-align:center">
-          <Icon type="ios-information-circle"></Icon>
-          <span>系统提示</span>
-        </p>
-        <div style="text-align:center">
-          <p>由于您不是注册用户，暂无权执行此操作，请注册登录后操作！</p>
-        </div>
-        <div slot="footer">
-          <Button type="info" size="large" long @click="handleLoginModal">我要去注册</Button>
-        </div>
-      </Modal>-->
     </section>
+    <Modal v-model="isModel" width="360" @on-cancel="handleCancel">
+      <p slot="header" style="color:#f60;text-align:center">
+        <Icon type="ios-information-circle"></Icon>
+        <span>系统提示</span>
+      </p>
+      <div style="text-align:center">
+        <p>此记录删除后将无法恢复，是否执行此次删除操作？</p>
+      </div>
+      <div slot="footer">
+        <Button
+          type="error"
+          size="large"
+          long
+          :loading="modal_loading"
+          @click="handleDelecteModal"
+        >确认删除</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -115,7 +129,8 @@ export default {
     pageNo: 1,
     pageSize: 10,
     total: 10,
-    isToLogin: false,
+    isModel: false,
+    modal_loading: false,
     columns: [
       {
         title: "项目名称",
@@ -161,7 +176,8 @@ export default {
       {
         title: "操作",
         slot: "action",
-        width: 110
+        align: "center",
+        width: 150
       }
     ],
     data6: [
@@ -172,7 +188,7 @@ export default {
       }
     ],
     content: [],
-    itemData: [], //当前部署版本
+    itemData: {},
     isOpen: true,
 
     cityList1: [],
@@ -247,54 +263,52 @@ export default {
     //部署站点
     handleDeploy(e) {
       // 用户权限控制
-      // if (this.user.name !== "Admin") {
-      // let uidArr = [];
-      // this.content.forEach(item => {
-      //   if (item.idDeployment === "yes") {
-      //     uidArr.push(item.bid);
-      //   }
-      // });
-      this.$Message.destroy();
-      this.$Message.loading({
-        content: "项目部署中，请稍后...",
-        duration: 0
-      });
-      let data = {
-        root: e.root,
-        version: e.version,
-        catalog: e.catalog,
-        bid: e.bid,
-        projectName: e.projectName,
-        // uidArr: JSON.stringify(uidArr)
-      };
-      this.$axios
-        .post("/api/deploy/edition/transfer", this.$qs.stringify(data))
-        .then(res => {
-          this.$Message.destroy();
-          if (res.data.result) {
-            this.$Message["success"]({
-              background: true,
-              content: "项目部署成功！"
-            });
-            // this.$emit("on-reset", {});
-            this.handleGetData();
-          } else {
+      if (this.user.name === "admin") {
+        this.$Notice.destroy();
+        this.$Notice.error({
+          title: "系统温馨提示",
+          desc: "您不是注册用户，请注册登录后操作！"
+        });
+      } else {
+        this.$Message.destroy();
+        this.$Message.loading({
+          content: "项目部署中，请稍后...",
+          duration: 0
+        });
+        let data = {
+          root: e.root,
+          version: e.version,
+          catalog: e.catalog,
+          bid: e.bid,
+          projectName: e.projectName
+          // uidArr: JSON.stringify(uidArr)
+        };
+        this.$axios
+          .post("/api/deploy/edition/transfer", this.$qs.stringify(data))
+          .then(res => {
+            this.$Message.destroy();
+            if (res.data.result) {
+              this.$Message["success"]({
+                background: true,
+                content: "项目部署成功！"
+              });
+              // this.$emit("on-reset", {});
+              this.handleGetData();
+            } else {
+              this.$Message["error"]({
+                background: true,
+                content: "项目部署失败！"
+              });
+            }
+          })
+          .catch(function(error) {
+            this.$Message.destroy();
             this.$Message["error"]({
               background: true,
               content: "项目部署失败！"
             });
-          }
-        })
-        .catch(function(error) {
-          this.$Message.destroy();
-          this.$Message["error"]({
-            background: true,
-            content: "项目部署失败！"
           });
-        });
-      // } else {
-      //   this.isToLogin = true;
-      // }
+      }
     },
     changePage(event) {
       this.pageNo = event;
@@ -304,36 +318,53 @@ export default {
       this.pageSize = event;
       this.handleGetData();
     },
-    handleToLogin() {
-      this.isToLogin = false;
-    },
-    handleLoginModal() {
-      window.sessionStorage.clear();
-      this.$store.commit("setUser", {});
-      this.$router.push({ path: "/login" });
-    },
-    // ********************************************************
-    setData(data) {
-      this.content = data.content;
-      this.itemData = data.content.filter(item => {
-        return item.idDeployment == "yes";
-      });
-      this.total = data.total;
-    },
-    // 访问站点
-    handleShow(e) {  
-      window.open(this.$url + e.webUrl+'/index.html');
-    },
-
-    onChange() {},
-    //编辑列表数据
-    // setAiIsShow() {
-    // 	this.isOpen = true;
-    // 	this.$event.emit("isOpenAdd", this.content[0]);
+    // handleToLogin() {
+    //   this.isToLogin = false;
     // },
-    setIsShow() {
-      this.isOpen = true;
-      this.$event.emit("isOpenAdd", this.content[0]);
+    // handleLoginModal() {
+    //   window.sessionStorage.clear();
+    //   this.$store.commit("setUser", {});
+    //   this.$router.push({ path: "/login" });
+    // },
+
+    // 访问站点
+    handleShow(e) {
+      window.open(this.$url + e.webUrl + "/index.html");
+    },
+    handleCancel() {
+      this.isModel = false;
+    },
+    handleDelecte(val) {
+      this.itemData = val;
+      this.isModel = true;
+    },
+    handleDelecteModal() {
+      this.$Message.destroy();
+      this.modal_loading = true;
+      let data = {
+        bid: this.itemData.bid,
+        root: this.itemData.root,
+        version: this.itemData.version,
+        catalog: this.itemData.catalog
+      };
+      this.$axios
+        .post("/api/deploy/edition/delete", this.$qs.stringify(data))
+        .then(res => {
+          if (res.data.result) {
+            // this.cityList1 = res.data.data;
+            this.handleGetData();
+          } else {
+            this.$Message["error"]({
+              background: true,
+              content: "数据删除失败！"
+            });
+          }
+          this.modal_loading = false;
+          this.isModel = false;
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
     },
     onCopy() {
       this.$Message.destroy();
@@ -348,31 +379,51 @@ export default {
         background: true,
         content: "复制失败！"
       });
-    },
-    getUser() {
-      this.$axios
-        .get("/api/person/user")
-        .then(res => {
-          if (res.data.result) {
-            this.cityList1 = res.data.data;
-          } else {
-            this.$Message["error"]({
-              background: true,
-              content: "数据请求失败！"
-            });
-          }
-        })
-        .catch(function(error) {
-          console.log(error);
-        });
-    },
-    handleQuery() {
-      this.$emit("on-reset", {
-        author: this.authorVal,
-        idDeployment: this.publishVal,
-        version: this.titleVal
-      });
     }
+    // ********************************************************
+    // setData(data) {
+    //   this.content = data.content;
+    //   this.itemData = data.content.filter(item => {
+    //     return item.idDeployment == "yes";
+    //   });
+    //   this.total = data.total;
+    // },
+
+    // onChange() {},
+    //编辑列表数据
+    // setAiIsShow() {
+    // 	this.isOpen = true;
+    // 	this.$event.emit("isOpenAdd", this.content[0]);
+    // },
+    // setIsShow() {
+    //   this.isOpen = true;
+    //   this.$event.emit("isOpenAdd", this.content[0]);
+    // },
+
+    // getUser() {
+    //   this.$axios
+    //     .get("/api/person/user")
+    //     .then(res => {
+    //       if (res.data.result) {
+    //         this.cityList1 = res.data.data;
+    //       } else {
+    //         this.$Message["error"]({
+    //           background: true,
+    //           content: "数据请求失败！"
+    //         });
+    //       }
+    //     })
+    //     .catch(function(error) {
+    //       console.log(error);
+    //     });
+    // },
+    // handleQuery() {
+    //   this.$emit("on-reset", {
+    //     author: this.authorVal,
+    //     idDeployment: this.publishVal,
+    //     version: this.titleVal
+    //   });
+    // }
   }
 };
 </script>

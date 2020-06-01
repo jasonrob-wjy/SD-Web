@@ -139,6 +139,8 @@
           </div>
         </div>
       </div>
+      <!-- 账号密码 -->
+      <p class="moren"><span>账号：admin</span><span>密码：123456</span></p>
     </div>
     <div class="bolang">
       <svg class="waves" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
